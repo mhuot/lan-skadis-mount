@@ -14,9 +14,9 @@ board, the pegboard doubles as a backstop the resting spools just graze.
   upright, hook throat = face metal 2.0 + 1.8 mm) was VERIFIED by printed
   gauges in ~/lan-spool-shelf — reuse changes from there deliberately.
 - Builds land in the Fusion cloud project **"LAN Pegboard Mount"** as the
-  document "Pegboard Mount Bracket"; each run saves a new version. The
-  hook stack and widths are parameter-driven; body/slot geometry is
-  script-driven with reference-only parameters.
+  document "Pegboard Mount Bracket"; each run saves a new version. EVERY
+  user parameter drives geometry — hooks, plate, bolt slots and nut tracks
+  alike — and the build fails if one goes inert or carries a wrong unit.
 
 ## Which scripts run where
 
@@ -24,6 +24,9 @@ board, the pegboard doubles as a backstop the resting spools just graze.
   `python3 scripts/run_in_fusion.py scripts/build_pegboard_bracket.py`
   (MCP server at 127.0.0.1:27182; Fusion must be running).
 - **Locally, in `.venv`**: `scripts/check_stl.py`.
+- **Fusion, any time**: `scripts/audit_parameters.py` — every parameter must
+  drive geometry, carry the right unit, and every sketch should be fully
+  constrained. The build script audits itself too.
 
 ## Printing
 
