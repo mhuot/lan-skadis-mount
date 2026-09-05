@@ -77,7 +77,7 @@ PEG_ROOT_HEIGHT = 4.0  # the slot's top edge bears on this
 PEG_PRONG_THICKNESS = 2.0  # sits in front of the board
 PEG_TOTAL_HEIGHT = BOARD_SLOT_HEIGHT - 3.0  # 12: fits the slot to lift off
 PEG_PRONG_CHAMFER = 1.2  # lead-in: the board is lowered on blind
-PEG_ROOT_FILLET = 1.0  # root/plate junction, top and bottom only
+PEG_BEARING_FILLET = 1.5  # the top edges the board actually lands on
 TOP_PEG_ROOT_Z = 45.0
 PEG_ROWS = 2
 
@@ -137,7 +137,11 @@ def parameters():
         "pegProngThickness": (PEG_PRONG_THICKNESS, "mm", "prong in front of board"),
         "pegTotalHeight": ("boardSlotHeight - 3 mm", "mm", "fits the slot to lift off"),
         "pegProngChamfer": (PEG_PRONG_CHAMFER, "mm", "lead-in on the prong top"),
-        "pegRootFillet": (PEG_ROOT_FILLET, "mm", "root/plate fillet, top and bottom"),
+        "pegBearingFillet": (
+            PEG_BEARING_FILLET,
+            "mm",
+            "round on the root top edges the board bears on",
+        ),
         "topPegRootZ": (TOP_PEG_ROOT_Z, "mm", "top peg root, above the plate foot"),
         "pegRows": (str(PEG_ROWS), "", "pegs per bracket (pattern count)"),
         "pegOffsetY": (peg_offset(), "mm", "offset onto the board's 40 mm grid"),
@@ -453,42 +457,52 @@ def _build_pegs(component, plane):
 
 
 def _fillet_peg_roots(component, body):
-    """Round where each peg root meets the plate, top and bottom only.
+    """Round the two top edges of each peg root — where the board lands.
 
-    Not for strength — at ~10 N per peg the root runs near 4 MPa against
-    roughly 40 — but the top fillet is where the board's slot edge bears, and
-    a sharp printed corner there embosses the panel. The sides are left sharp
-    on purpose: the root is 4.8 mm in a 5 mm slot, so a side fillet would
-    stop the board sitting flush against the plate. Vertically there is 15 mm
-    of slot to spare, which is also the direction the load acts.
+    These are the long edges bounding the root's top face, running out from
+    the plate to the prong. The board's slot descends over the root and its
+    top edge comes to rest on that face, so these are the corners it slides
+    past on the way down and bears against once seated.
+
+    An earlier version filleted the root/plate junction instead, reasoning
+    that it was the tension side of a cantilever. It is — but at ~4 MPa of
+    ~40 that never mattered, and those edges sit inside the slot's void
+    where the board never touches them. Corrected after the user moved the
+    fillet in the document; the geometry here reproduces theirs.
     """
-    face_x = PLATE_THICKNESS
-    wanted_z = []
-    for row in range(PEG_ROWS):
-        base = TOP_PEG_ROOT_Z - row * BOARD_PITCH
-        wanted_z += [base, base + PEG_ROOT_HEIGHT]
+    root_end = PLATE_THICKNESS + PEG_ROOT_LENGTH
+    wanted_z = [
+        TOP_PEG_ROOT_Z - row * BOARD_PITCH + PEG_ROOT_HEIGHT for row in range(PEG_ROWS)
+    ]
+    wanted_y = [peg_offset() - PEG_WIDTH / 2.0, peg_offset() + PEG_WIDTH / 2.0]
     edges = adsk.core.ObjectCollection.create()
     for index in range(body.edges.count):
         edge = body.edges.item(index)
         start = edge.startVertex.geometry
         end = edge.endVertex.geometry
-        if abs(start.x - end.x) > 1e-6 or abs(start.z - end.z) > 1e-6:
-            continue  # must run along Y
-        if abs(start.x / MM - face_x) > 0.01:
-            continue  # must lie in the plate face
-        if any(abs(start.z / MM - z) < 0.01 for z in wanted_z):
-            edges.add(edge)
+        if abs(start.y - end.y) > 1e-6 or abs(start.z - end.z) > 1e-6:
+            continue  # must run along X, out from the plate
+        if abs(start.x - end.x) < 1e-6:
+            continue
+        low_x, high_x = sorted((start.x / MM, end.x / MM))
+        if low_x < PLATE_THICKNESS - 0.01 or high_x > root_end + 0.01:
+            continue
+        if not any(abs(start.z / MM - z) < 0.01 for z in wanted_z):
+            continue
+        if not any(abs(start.y / MM - y) < 0.01 for y in wanted_y):
+            continue
+        edges.add(edge)
     expected = 2 * PEG_ROWS
     if edges.count != expected:
         raise RuntimeError(
-            f"expected {expected} peg root edges to fillet, found {edges.count}"
+            f"expected {expected} peg bearing edges to fillet, found {edges.count}"
         )
     fillets = component.features.filletFeatures
     fillet_input = fillets.createInput()
     fillet_input.addConstantRadiusEdgeSet(
-        edges, adsk.core.ValueInput.createByString("pegRootFillet"), True
+        edges, adsk.core.ValueInput.createByString("pegBearingFillet"), True
     )
-    fillets.add(fillet_input).name = "Peg root fillets"
+    fillets.add(fillet_input).name = "Peg bearing fillets"
 
 
 def _probe(body, x_mm, y_mm, z_mm):
@@ -691,9 +705,19 @@ def run(_context: str):
         f"scripted {BUILD_VARIANT} build {datetime.date.today().isoformat()}: "
         f"peg offset {peg_offset():.1f} mm, board {BOARD_THICKNESS} mm"
     )
+    # saveAs and save return a BOOLEAN. Ignoring it prints "saved" over six
+    # documents that were never written: they stay open, unsaved, and named,
+    # which looks exactly like success from the script's side.
     if data_file is None:
-        document.saveAs(doc_name(), folder, description, "")
+        saved = document.saveAs(doc_name(), folder, description, "")
     else:
-        document.save(description)
+        saved = document.save(description)
+    # saveAs can return True and still not save: the document stays open,
+    # named, and unsaved. isSaved is the only answer worth believing.
+    if not saved or not document.isSaved:
+        raise RuntimeError(
+            f"{doc_name()!r} NOT saved (saveAs returned {saved}, "
+            f"isSaved={document.isSaved}). The CAD exports above are still good."
+        )
     print(f"saved '{doc_name()}' in project '{FUSION_PROJECT_NAME}': {description}")
     print("build complete")
