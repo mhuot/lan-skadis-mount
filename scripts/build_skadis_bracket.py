@@ -81,9 +81,9 @@ PEG_BEARING_FILLET = 1.5  # the top edges the board actually lands on
 TOP_PEG_ROOT_Z = 45.0
 PEG_ROWS = 2
 PEG_EDGE_MARGIN = 1.6  # plate left either side of a peg
-# Set to a number to place the pegs by hand instead of by the grid maths:
-# negative shifts the pegs, and so the whole board, to the LEFT.
-PEG_OFFSET_OVERRIDE = -6.0  # shift the board 6 mm LEFT
+# Where the LEFT bracket's pegs sit, relative to its upright. This is a free
+# choice: it decides where the board sits along the desk. Negative is left.
+LEFT_PEG_OFFSET = -6.5
 
 
 # These three depend on BUILD_VARIANT, so they MUST be computed when run()
@@ -92,27 +92,40 @@ PEG_OFFSET_OVERRIDE = -6.0  # shift the board 6 mm LEFT
 # from BUILD_VARIANT is baked in at the default before the override lands.
 # Getting this wrong built the right-hand bracket as a left one and saved it
 # over the left document, reporting success the whole way.
-def peg_offset():
-    """Horizontal peg offset for this bracket, mm. SIGNED.
+def grid_correction():
+    """How far the right bracket's peg must sit from the left one's, mm.
 
-    Positive moves the pegs — and therefore the board — to the right;
-    negative moves them left. Left brackets sit on a column by definition;
-    the right ones take up whatever the upright spacing leaves against the
-    board's 40 mm grid, and there are always two ways to do that: stretch
-    to the next column up (positive) or pull back to the one below
-    (negative). PEG_OFFSET_OVERRIDE wins over both when it is not None,
-    which is how you shift the whole board sideways.
+    Only the DIFFERENCE between the two offsets matters: the pegs have to
+    land on board columns a whole number of boardPitch apart, and the
+    brackets are pinned to uprights uprightSpacing apart. So
+
+        uprightSpacing + rightOffset - leftOffset = k * boardPitch
+
+    With 711.2 mm uprights and a 40 mm pitch the two candidates are 720
+    (+8.8, pegs move apart) and 680 (-31.2, pegs move together). The
+    smaller correction wins; the other needs 15.6 mm on each bracket, well
+    past what the plate allows.
     """
-    if PEG_OFFSET_OVERRIDE is not None:
-        return float(PEG_OFFSET_OVERRIDE)
-    if BUILD_VARIANT == "left":
-        return 0.0
     remainder = UPRIGHT_SPACING % BOARD_PITCH
     if not remainder:
         return 0.0
-    stretch = round(BOARD_PITCH - remainder, 2)  # next column out, positive
-    pull = round(-remainder, 2)  # previous column, negative
-    return stretch if abs(stretch) <= abs(pull) else pull
+    apart = round(BOARD_PITCH - remainder, 2)
+    together = round(-remainder, 2)
+    return apart if abs(apart) <= abs(together) else together
+
+
+def peg_offset():
+    """This bracket's peg offset, mm. Negative is left.
+
+    The left bracket is placed where the board should sit; the right one is
+    that plus the grid correction. Hard-coding the left at zero and putting
+    the whole correction on the right is what made the right bracket
+    unbuildable: +8.8 mm walked its peg off a 24 mm plate, where -6.5 and
+    +2.3 both fit with room to spare.
+    """
+    if BUILD_VARIANT == "left":
+        return float(LEFT_PEG_OFFSET)
+    return round(LEFT_PEG_OFFSET + grid_correction(), 2)
 
 
 def _check_peg_geometry():
