@@ -81,9 +81,13 @@ PEG_BEARING_FILLET = 1.5  # the top edges the board actually lands on
 TOP_PEG_ROOT_Z = 45.0
 PEG_ROWS = 2
 PEG_EDGE_MARGIN = 1.6  # plate left either side of a peg
-# Where the LEFT bracket's pegs sit, relative to its upright. This is a free
-# choice: it decides where the board sits along the desk. Negative is left.
-LEFT_PEG_OFFSET = -6.5
+# The grid correction is split evenly between the two brackets, so they are
+# a mirrored pair: equal gap from each peg to its outer plate edge. Only the
+# DIFFERENCE between the two offsets is fixed by the board's column grid;
+# how it is split is free, and splitting it in half is the symmetric choice.
+# Set BOARD_SHIFT to slide the whole board along the desk without breaking
+# that symmetry: it moves both brackets' pegs together.
+BOARD_SHIFT = 0.0
 
 
 # These three depend on BUILD_VARIANT, so they MUST be computed when run()
@@ -117,15 +121,16 @@ def grid_correction():
 def peg_offset():
     """This bracket's peg offset, mm. Negative is left.
 
-    The left bracket is placed where the board should sit; the right one is
-    that plus the grid correction. Hard-coding the left at zero and putting
-    the whole correction on the right is what made the right bracket
-    unbuildable: +8.8 mm walked its peg off a 24 mm plate, where -6.5 and
-    +2.3 both fit with room to spare.
+    Half the grid correction goes each way, which makes the two brackets a
+    mirrored pair with equal peg-to-edge gaps. Hard-coding the left at zero
+    and loading the whole correction onto the right is what made the right
+    bracket unbuildable — +8.8 mm walked its peg off a 24 mm plate — and
+    even after relating the two, an uneven split left one peg crowding an
+    edge while the other sat near the middle.
     """
-    if BUILD_VARIANT == "left":
-        return float(LEFT_PEG_OFFSET)
-    return round(LEFT_PEG_OFFSET + grid_correction(), 2)
+    half = grid_correction() / 2.0
+    sign = -1.0 if BUILD_VARIANT == "left" else 1.0
+    return round(BOARD_SHIFT + sign * half, 2)
 
 
 def _check_peg_geometry():
