@@ -76,6 +76,8 @@ PEG_ROOT_LENGTH = BOARD_THICKNESS + 0.2  # through the board
 PEG_ROOT_HEIGHT = 4.0  # the slot's top edge bears on this
 PEG_PRONG_THICKNESS = 2.0  # sits in front of the board
 PEG_TOTAL_HEIGHT = BOARD_SLOT_HEIGHT - 3.0  # 12: fits the slot to lift off
+PEG_PRONG_CHAMFER = 1.2  # lead-in: the board is lowered on blind
+PEG_ROOT_FILLET = 1.0  # root/plate junction, top and bottom only
 TOP_PEG_ROOT_Z = 45.0
 PEG_ROWS = 2
 
@@ -134,6 +136,8 @@ def parameters():
         "pegRootHeight": (PEG_ROOT_HEIGHT, "mm", "slot top edge bears on this"),
         "pegProngThickness": (PEG_PRONG_THICKNESS, "mm", "prong in front of board"),
         "pegTotalHeight": ("boardSlotHeight - 3 mm", "mm", "fits the slot to lift off"),
+        "pegProngChamfer": (PEG_PRONG_CHAMFER, "mm", "lead-in on the prong top"),
+        "pegRootFillet": (PEG_ROOT_FILLET, "mm", "root/plate fillet, top and bottom"),
         "topPegRootZ": (TOP_PEG_ROOT_Z, "mm", "top peg root, above the plate foot"),
         "pegRows": (str(PEG_ROWS), "", "pegs per bracket (pattern count)"),
         "pegOffsetY": (peg_offset(), "mm", "offset onto the board's 40 mm grid"),
@@ -392,23 +396,39 @@ def _build_pegs(component, plane):
     base_expression = "topPegRootZ"
     root_top_expression = "topPegRootZ + pegRootHeight"
     prong_top_expression = "topPegRootZ + pegTotalHeight"
+    chamfer = PEG_PRONG_CHAMFER
+    # The prong's top outer corner is chamfered: the board is lowered onto
+    # these pegs blind, with the prong hidden behind it, so a slot that
+    # arrives slightly off needs somewhere to slide rather than something to
+    # catch on. Exactly the failure the first slot gauge had on the upright.
     corners = [
         (face, base, face_expression, base_expression),
-        (prong_end, base, None, None),
-        (prong_end, prong_top, prong_end_expression, prong_top_expression),
-        (root_end, prong_top, None, None),
-        (root_end, root_top, root_end_expression, root_top_expression),
+        (prong_end, base, prong_end_expression, None),
+        (
+            prong_end,
+            prong_top - chamfer,
+            None,
+            f"{prong_top_expression} - pegProngChamfer",
+        ),
+        (
+            prong_end - chamfer,
+            prong_top,
+            f"{prong_end_expression} - pegProngChamfer",
+            prong_top_expression,
+        ),
+        (root_end, prong_top, root_end_expression, None),
+        (root_end, root_top, None, root_top_expression),
         (face, root_top, None, None),
     ]
     lines = _polyline(sketch, [(x, z) for x, z, _, _ in corners])
     constraints = sketch.geometricConstraints
-    # lines run corner0->1, 1->2, ... so the alternating edges are
-    # horizontal, vertical, horizontal, ... Getting these two groups the
-    # wrong way round deforms the profile silently: the sketch still solves,
-    # the extrude still succeeds, and only a probe catches it.
-    for line in (lines[0], lines[2], lines[4]):
+    # Alternating edges are horizontal and vertical, except line 2 which is
+    # the chamfer and stays free. Getting these groups the wrong way round
+    # deforms the profile silently: the sketch still solves, the extrude
+    # still succeeds, and only a probe catches it.
+    for line in (lines[0], lines[3], lines[5]):
         constraints.addHorizontal(line)
-    for line in (lines[1], lines[3], lines[5]):
+    for line in (lines[1], lines[4], lines[6]):
         constraints.addVertical(line)
     _pin_corners(sketch, lines, corners)
     extrude = _extrude(
@@ -430,6 +450,45 @@ def _build_pegs(component, plane):
         adsk.fusion.PatternDistanceType.SpacingPatternDistanceType,
     )
     patterns.add(pattern_input).name = "Peg rows"
+
+
+def _fillet_peg_roots(component, body):
+    """Round where each peg root meets the plate, top and bottom only.
+
+    Not for strength — at ~10 N per peg the root runs near 4 MPa against
+    roughly 40 — but the top fillet is where the board's slot edge bears, and
+    a sharp printed corner there embosses the panel. The sides are left sharp
+    on purpose: the root is 4.8 mm in a 5 mm slot, so a side fillet would
+    stop the board sitting flush against the plate. Vertically there is 15 mm
+    of slot to spare, which is also the direction the load acts.
+    """
+    face_x = PLATE_THICKNESS
+    wanted_z = []
+    for row in range(PEG_ROWS):
+        base = TOP_PEG_ROOT_Z - row * BOARD_PITCH
+        wanted_z += [base, base + PEG_ROOT_HEIGHT]
+    edges = adsk.core.ObjectCollection.create()
+    for index in range(body.edges.count):
+        edge = body.edges.item(index)
+        start = edge.startVertex.geometry
+        end = edge.endVertex.geometry
+        if abs(start.x - end.x) > 1e-6 or abs(start.z - end.z) > 1e-6:
+            continue  # must run along Y
+        if abs(start.x / MM - face_x) > 0.01:
+            continue  # must lie in the plate face
+        if any(abs(start.z / MM - z) < 0.01 for z in wanted_z):
+            edges.add(edge)
+    expected = 2 * PEG_ROWS
+    if edges.count != expected:
+        raise RuntimeError(
+            f"expected {expected} peg root edges to fillet, found {edges.count}"
+        )
+    fillets = component.features.filletFeatures
+    fillet_input = fillets.createInput()
+    fillet_input.addConstantRadiusEdgeSet(
+        edges, adsk.core.ValueInput.createByString("pegRootFillet"), True
+    )
+    fillets.add(fillet_input).name = "Peg root fillets"
 
 
 def _probe(body, x_mm, y_mm, z_mm):
@@ -606,6 +665,9 @@ def run(_context: str):
     _build_plate(component, plane)
     _build_hooks(component, plane)
     _build_pegs(component, plane)
+    if component.bRepBodies.count != 1:
+        raise RuntimeError(f"expected one body, got {component.bRepBodies.count}")
+    _fillet_peg_roots(component, component.bRepBodies.item(0))
 
     if component.bRepBodies.count != 1:
         raise RuntimeError(f"expected one body, got {component.bRepBodies.count}")

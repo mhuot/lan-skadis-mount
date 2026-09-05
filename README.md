@@ -68,10 +68,11 @@ Print two of each per board.
 
 | | |
 |---|---|
-| Bracket | 60 × 24 × 20.5 mm, ~8.6 cm³, ~9 g |
+| Bracket | 60 × 24 × 20.5 mm, ~8.8 cm³, ~9 g |
+| Rounding | 1.2 mm lead-in chamfer on the prong top (the board is lowered on blind); 1 mm fillet where each root meets the plate, top and bottom only — the sides stay sharp because the root is 4.8 mm in a 5 mm slot |
 | Board | SKÅDIS 4.6 mm thick, 5 × 15 mm slots, 40 mm grid |
 | Board face | lands 10 mm off the upright — same plane as the pegboard version, so it still works as a spool backstop |
-| Print | plate flat on the bed, hooks and pegs up; supports on build plate only |
+| Print | **on its side**, the 24 mm face on the bed — same rule as the spool brackets. That puts the peg's bending stress along the layers instead of across them, and leaves essentially no overhangs. Printing it plate-flat stands each peg on a layer bond and a knock will snap one off. |
 
 ### Credit
 
