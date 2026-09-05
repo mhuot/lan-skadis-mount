@@ -74,12 +74,16 @@ TOP_HOOK_NECK_TOP = PLATE_HEIGHT - 2.0
 PEG_WIDTH = BOARD_SLOT_WIDTH - 0.2  # 4.8, slides in the 5 mm slot
 PEG_ROOT_LENGTH = BOARD_THICKNESS + 0.2  # through the board
 PEG_ROOT_HEIGHT = 4.0  # the slot's top edge bears on this
-PEG_PRONG_THICKNESS = 2.0  # sits in front of the board
-PEG_TOTAL_HEIGHT = BOARD_SLOT_HEIGHT - 3.0  # 12: fits the slot to lift off
-PEG_PRONG_CHAMFER = 1.2  # lead-in: the board is lowered on blind
+PEG_PRONG_THICKNESS = 1.0  # sits in front of the board; 1 mm shorter overall
+PEG_TOTAL_HEIGHT = BOARD_SLOT_HEIGHT - 4.0  # 11: prong rises 7 mm above the root
+PEG_PRONG_CHAMFER = 0.6  # lead-in; must stay under the prong thickness
 PEG_BEARING_FILLET = 1.5  # the top edges the board actually lands on
 TOP_PEG_ROOT_Z = 45.0
 PEG_ROWS = 2
+PEG_EDGE_MARGIN = 1.6  # plate left either side of a peg
+# Set to a number to place the pegs by hand instead of by the grid maths:
+# negative shifts the pegs, and so the whole board, to the LEFT.
+PEG_OFFSET_OVERRIDE = -6.0  # shift the board 6 mm LEFT
 
 
 # These three depend on BUILD_VARIANT, so they MUST be computed when run()
@@ -89,15 +93,58 @@ PEG_ROWS = 2
 # Getting this wrong built the right-hand bracket as a left one and saved it
 # over the left document, reporting success the whole way.
 def peg_offset():
-    """Horizontal peg offset for this bracket, mm.
+    """Horizontal peg offset for this bracket, mm. SIGNED.
 
-    The left brackets sit on a column; the right ones take up the leftover
-    of the upright spacing against the board's 40 mm grid.
+    Positive moves the pegs — and therefore the board — to the right;
+    negative moves them left. Left brackets sit on a column by definition;
+    the right ones take up whatever the upright spacing leaves against the
+    board's 40 mm grid, and there are always two ways to do that: stretch
+    to the next column up (positive) or pull back to the one below
+    (negative). PEG_OFFSET_OVERRIDE wins over both when it is not None,
+    which is how you shift the whole board sideways.
     """
+    if PEG_OFFSET_OVERRIDE is not None:
+        return float(PEG_OFFSET_OVERRIDE)
     if BUILD_VARIANT == "left":
         return 0.0
     remainder = UPRIGHT_SPACING % BOARD_PITCH
-    return round(BOARD_PITCH - remainder, 2) if remainder else 0.0
+    if not remainder:
+        return 0.0
+    stretch = round(BOARD_PITCH - remainder, 2)  # next column out, positive
+    pull = round(-remainder, 2)  # previous column, negative
+    return stretch if abs(stretch) <= abs(pull) else pull
+
+
+def _check_peg_geometry():
+    """The chamfer cannot be deeper than the prong it is cut into.
+
+    Shortening the prong to 1 mm while the lead-in chamfer stayed at 1.2 mm
+    would have eaten the whole prong and then some — the sketch would still
+    have solved into something, silently.
+    """
+    if PEG_PRONG_CHAMFER >= PEG_PRONG_THICKNESS:
+        raise RuntimeError(
+            f"pegProngChamfer {PEG_PRONG_CHAMFER} mm must be less than "
+            f"pegProngThickness {PEG_PRONG_THICKNESS} mm"
+        )
+    if PEG_ROOT_LENGTH < BOARD_THICKNESS:
+        raise RuntimeError(
+            f"pegRootLength {PEG_ROOT_LENGTH} mm is shorter than the board's "
+            f"{BOARD_THICKNESS} mm: the root would not reach through it"
+        )
+
+
+def _check_peg_offset():
+    """A peg has to stay on the plate, with wall left either side of it."""
+    limit = BRACKET_WIDTH / 2.0 - PEG_WIDTH / 2.0 - PEG_EDGE_MARGIN
+    if abs(peg_offset()) > limit:
+        raise RuntimeError(
+            f"pegOffsetY {peg_offset():+.1f} mm exceeds +/-{limit:.1f} mm for a "
+            f"{BRACKET_WIDTH:.0f} mm plate. Widen BRACKET_WIDTH to at least "
+            f"{2 * (abs(peg_offset()) + PEG_WIDTH / 2.0 + PEG_EDGE_MARGIN):.0f} mm, "
+            "remembering that over 25.4 mm two brackets can no longer sit side "
+            "by side at the module centre at the same height."
+        )
 
 
 def export_name():
@@ -135,7 +182,11 @@ def parameters():
         "pegRootLength": ("boardThickness + 0.2 mm", "mm", "root through the board"),
         "pegRootHeight": (PEG_ROOT_HEIGHT, "mm", "slot top edge bears on this"),
         "pegProngThickness": (PEG_PRONG_THICKNESS, "mm", "prong in front of board"),
-        "pegTotalHeight": ("boardSlotHeight - 3 mm", "mm", "fits the slot to lift off"),
+        "pegTotalHeight": (
+            "boardSlotHeight - 4 mm",
+            "mm",
+            "prong rise above the root, and the lift needed to release",
+        ),
         "pegProngChamfer": (PEG_PRONG_CHAMFER, "mm", "lead-in on the prong top"),
         "pegBearingFillet": (
             PEG_BEARING_FILLET,
@@ -676,6 +727,8 @@ def run(_context: str):
     _ensure_parameters(design)
     component = design.rootComponent
     plane = component.xZConstructionPlane
+    _check_peg_offset()
+    _check_peg_geometry()
     _build_plate(component, plane)
     _build_hooks(component, plane)
     _build_pegs(component, plane)
