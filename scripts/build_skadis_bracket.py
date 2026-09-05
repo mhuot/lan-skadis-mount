@@ -48,7 +48,13 @@ SLOT_WIDTH = 3.2
 SLOT_HEIGHT = 19.05
 SLOT_PITCH_VERTICAL = 25.4
 FACE_METAL_THICKNESS = 2.0
-UPRIGHT_SPACING = 711.2  # 28 inches nominal — MEASURE YOURS
+# MEASURED 2026-09-05: 28 13/16" (731.84 mm) between the FACING edges of the
+# two slot columns — right edge of the left slot to left edge of the right
+# slot. Centre-to-centre is that plus one slot width, because each centre
+# sits half a slot in from the edge that was measured. The old 711.2 was a
+# nominal 28" and was 23.8 mm wrong, which is most of a slot column.
+SLOT_INSIDE_GAP = 731.84
+UPRIGHT_SPACING = SLOT_INSIDE_GAP + SLOT_WIDTH
 
 # --- SKADIS interface (community-measured; confirm on your own board) ------
 BOARD_THICKNESS = 4.6
