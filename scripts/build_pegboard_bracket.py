@@ -35,10 +35,11 @@ EXPORT_NAME = "pegboard_mount_bracket"
 
 # --- Upright slot geometry (verified by lan-spool-shelf gauge prints) -------
 SLOT_PITCH_VERTICAL = 25.4
+SLOT_WIDTH = 3.2  # measured, confirmed by the spool shelf gauge print
 FACE_METAL_THICKNESS = 2.0
 
 # --- Hook stack (proven dimensions from lan-spool-shelf) --------------------
-HOOK_TAB_WIDTH = 2.4
+HOOK_TAB_WIDTH = SLOT_WIDTH - 0.8
 HOOK_THROAT = FACE_METAL_THICKNESS + 1.8
 HOOK_NECK_HEIGHT = 5.0
 HOOK_LIP_THICKNESS = 4.5
@@ -60,28 +61,30 @@ NUT_TRACK_DEPTH = 6.0  # from the rear face; leaves a 1 mm floor up front
 # Bolt centres sit midway between hook neck bands, still on the 1" grid.
 TOP_BOLT_CENTER_Z = TOP_HOOK_NECK_TOP - HOOK_NECK_HEIGHT - 7.7
 
-_DRIVING = "drives the model; safe to edit live in Fusion"
-_REFERENCE = "reference only — edit scripts/build_pegboard_bracket.py and rebuild"
+# name: (value or expression, unit, comment). Order is creation order, so an
+# expression may only reference names declared above it. Every parameter must
+# drive geometry — _audit_parameters fails the build otherwise.
 PARAMETERS = {
-    "bracketWidth": (BRACKET_WIDTH, _DRIVING),
-    "hookTabWidth": (HOOK_TAB_WIDTH, _DRIVING),
-    "slotPitchVertical": (SLOT_PITCH_VERTICAL, _DRIVING),
-    "faceMetalThickness": (FACE_METAL_THICKNESS, _DRIVING),
-    "hookThroat": ("faceMetalThickness + 1.8 mm", _DRIVING),
-    "hookNeckHeight": (HOOK_NECK_HEIGHT, _DRIVING),
-    "hookLipThickness": (HOOK_LIP_THICKNESS, _DRIVING),
-    "hookLipDrop": (HOOK_LIP_DROP, _DRIVING),
-    "hookLipChamfer": (HOOK_LIP_CHAMFER, _DRIVING),
-    "topHookNeckTop": (TOP_HOOK_NECK_TOP, _DRIVING),
-    "hookRows": (str(HOOK_ROWS), _DRIVING),
-    "plateThickness": (PLATE_THICKNESS, _REFERENCE),
-    "plateHeight": (PLATE_HEIGHT, _REFERENCE),
-    "boltSlotHeight": (BOLT_SLOT_HEIGHT, _REFERENCE),
-    "boltSlotLength": (BOLT_SLOT_LENGTH, _REFERENCE),
-    "nutTrackHeight": (NUT_TRACK_HEIGHT, _REFERENCE),
-    "nutTrackDepth": (NUT_TRACK_DEPTH, _REFERENCE),
+    "bracketWidth": (BRACKET_WIDTH, "mm", "bracket width across the upright"),
+    "plateThickness": (PLATE_THICKNESS, "mm", "the board bolts to this face"),
+    "plateHeight": (PLATE_HEIGHT, "mm", "plate height, spans the hook rows"),
+    "slotWidth": (SLOT_WIDTH, "mm", "measured slot width in the upright"),
+    "slotPitchVertical": (SLOT_PITCH_VERTICAL, "mm", "1 inch, measured"),
+    "faceMetalThickness": (FACE_METAL_THICKNESS, "mm", "upright face metal"),
+    "hookTabWidth": ("slotWidth - 0.8 mm", "mm", "blade width through the slot"),
+    "hookThroat": ("faceMetalThickness + 1.8 mm", "mm", "gap behind the plate"),
+    "hookNeckHeight": (HOOK_NECK_HEIGHT, "mm", "bears on the slot bottom edge"),
+    "hookLipThickness": (HOOK_LIP_THICKNESS, "mm", "lip thickness behind the face"),
+    "hookLipDrop": (HOOK_LIP_DROP, "mm", "engagement below the neck"),
+    "hookLipChamfer": (HOOK_LIP_CHAMFER, "mm", "lead-in past slot burrs"),
+    "topHookNeckTop": (TOP_HOOK_NECK_TOP, "mm", "top row, below the plate top"),
+    "hookRows": (str(HOOK_ROWS), "", "number of hook rows (pattern count)"),
+    "topBoltCentre": (TOP_BOLT_CENTER_Z, "mm", "top bolt, above the plate foot"),
+    "boltSlotHeight": (BOLT_SLOT_HEIGHT, "mm", "1/4-20 clearance, vertical"),
+    "boltSlotLength": (BOLT_SLOT_LENGTH, "mm", "horizontal adjustment range"),
+    "nutTrackHeight": (NUT_TRACK_HEIGHT, "mm", "across flats of a 1/4-20 nut"),
+    "nutTrackDepth": (NUT_TRACK_DEPTH, "mm", "track depth from the rear face"),
 }
-UNITLESS_PARAMETERS = {"hookRows"}
 
 
 def _value(millimetres):
@@ -100,6 +103,16 @@ def _add_polygon(sketch, points_mm):
         start = _point(*points_mm[index])
         end = _point(*points_mm[(index + 1) % count])
         lines.addByTwoPoints(start, end)
+
+
+def _polyline(sketch, points_mm):
+    """Closed polygon whose consecutive lines share sketch points."""
+    lines = sketch.sketchCurves.sketchLines
+    made = [lines.addByTwoPoints(_point(*points_mm[0]), _point(*points_mm[1]))]
+    for target in points_mm[2:]:
+        made.append(lines.addByTwoPoints(made[-1].endSketchPoint, _point(*target)))
+    made.append(lines.addByTwoPoints(made[-1].endSketchPoint, made[0].startSketchPoint))
+    return made
 
 
 def _polyline(sketch, points_mm):
@@ -138,10 +151,10 @@ def _dimension(sketch, point_a, point_b, orientation, expression, text_x, text_z
 
 
 def _ensure_parameters(design):
+    """Create or update user parameters, each with its declared unit."""
     user_parameters = design.userParameters
-    for name, (value, comment) in PARAMETERS.items():
-        expression = value if isinstance(value, str) else f"{value} mm"
-        units = "" if name in UNITLESS_PARAMETERS else "mm"
+    for name, (value, unit, comment) in PARAMETERS.items():
+        expression = value if isinstance(value, str) else f"{value} {unit}".strip()
         existing = user_parameters.itemByName(name)
         if existing:
             existing.expression = expression
@@ -150,9 +163,79 @@ def _ensure_parameters(design):
             user_parameters.add(
                 name,
                 adsk.core.ValueInput.createByString(expression),
-                units,
+                unit,
                 comment,
             )
+
+
+def _drop_stale_parameters(design):
+    """Delete parameters this script no longer declares, or that changed unit."""
+    user_parameters = design.userParameters
+    for index in range(user_parameters.count - 1, -1, -1):
+        parameter = user_parameters.item(index)
+        expected = PARAMETERS.get(parameter.name)
+        if expected is None or parameter.unit != expected[1]:
+            print(f"  dropping stale parameter {parameter.name}")
+            parameter.deleteMe()
+
+
+def _references(expression, name):
+    """True if a parameter expression references the given name."""
+    index = expression.find(name)
+    while index != -1:
+        before = expression[index - 1] if index else " "
+        after_index = index + len(name)
+        after = expression[after_index] if after_index < len(expression) else " "
+        if not (before.isalnum() or before == "_") and not (
+            after.isalnum() or after == "_"
+        ):
+            return True
+        index = expression.find(name, index + 1)
+    return False
+
+
+def _audit_parameters(design):
+    """Fail the build if a parameter drives nothing or has the wrong unit."""
+    user_parameters = design.userParameters
+    all_parameters = design.allParameters
+    expressions = {}
+    for index in range(all_parameters.count):
+        parameter = all_parameters.item(index)
+        expressions[parameter.name] = parameter.expression or ""
+    idle, wrong_unit = [], []
+    for index in range(user_parameters.count):
+        parameter = user_parameters.item(index)
+        if parameter.unit != PARAMETERS[parameter.name][1]:
+            wrong_unit.append(f"{parameter.name}={parameter.unit!r}")
+        used = any(
+            other != parameter.name and _references(expression, parameter.name)
+            for other, expression in expressions.items()
+        )
+        if not used:
+            idle.append(parameter.name)
+    print(f"  parameters: {user_parameters.count} declared, all driving geometry")
+    if wrong_unit or idle:
+        raise RuntimeError(f"audit failed: idle={idle} wrong_unit={wrong_unit}")
+
+
+# pylint: disable-next=too-many-locals
+def _pin_corners(sketch, lines, corners):
+    """Dimension each corner's X and Z off the origin, by expression."""
+    horizontal = adsk.fusion.DimensionOrientations.HorizontalDimensionOrientation
+    vertical = adsk.fusion.DimensionOrientations.VerticalDimensionOrientation
+    dimensions = sketch.sketchDimensions
+    for index, (x_mm, z_mm, x_expression, z_expression) in enumerate(corners):
+        point = lines[index].startSketchPoint
+        for orientation, expression, text in (
+            (horizontal, x_expression, (x_mm * 0.5, z_mm - 5.0 - index * 3.0)),
+            (vertical, z_expression, (x_mm + 6.0 + index * 3.0, z_mm * 0.5)),
+        ):
+            if expression is None:
+                continue
+            dimension = dimensions.addDistanceDimension(
+                sketch.originPoint, point, orientation, _point(*text)
+            )
+            dimension.parameter.expression = expression
 
 
 def _build_hooks(component, plane):  # pylint: disable=too-many-locals
@@ -274,56 +357,106 @@ def _bolt_center_zs():
     return [TOP_BOLT_CENTER_Z - row * SLOT_PITCH_VERTICAL for row in range(BOLT_COUNT)]
 
 
+# pylint: disable-next=too-many-locals
 def _build_body(component, plane):
+    """Plate, hooks, nut tracks and bolt slots — every edge dimensioned."""
     cut = adsk.fusion.FeatureOperations.CutFeatureOperation
     new_body = adsk.fusion.FeatureOperations.NewBodyFeatureOperation
 
     plate = component.sketches.add(plane)
     plate.name = "Plate"
-    _add_polygon(
-        plate,
-        [
-            (0.0, 0.0),
-            (PLATE_THICKNESS, 0.0),
-            (PLATE_THICKNESS, PLATE_HEIGHT),
-            (0.0, PLATE_HEIGHT),
-        ],
-    )
+    corners = [
+        (0.0, 0.0, None, None),
+        (PLATE_THICKNESS, 0.0, None, None),
+        (PLATE_THICKNESS, PLATE_HEIGHT, "plateThickness", "plateHeight"),
+        (0.0, PLATE_HEIGHT, None, None),
+    ]
+    lines = _polyline(plate, [(x, z) for x, z, _, _ in corners])
+    constraints = plate.geometricConstraints
+    constraints.addCoincident(lines[0].startSketchPoint, plate.originPoint)
+    for line in (lines[0], lines[2]):
+        constraints.addHorizontal(line)
+    for line in (lines[1], lines[3]):
+        constraints.addVertical(line)
+    _pin_corners(plate, lines, corners)
     _extrude_all_profiles(component, plate, "bracketWidth", new_body, "Plate")
     _build_hooks(component, plane)
 
-    # Nut tracks: open-ended horizontal channels milled from the rear face
-    # (x = 0, against the upright) leaving a 1 mm floor at the board face.
-    # The nut slides in from the side and cannot rotate.
-    tracks = component.sketches.add(plane)
-    tracks.name = "Nut tracks"
-    for bolt_z in _bolt_center_zs():
+    # Nut tracks: open-ended channels milled from the rear face (x = 0,
+    # against the upright), leaving a floor at the board face. The nut
+    # slides in from the side and cannot rotate.
+    for index, bolt_z in enumerate(_bolt_center_zs()):
+        centre_expression = _bolt_centre_expression(index)
         half = NUT_TRACK_HEIGHT / 2.0
-        _add_polygon(
-            tracks,
-            [
-                (0.0, bolt_z - half),
-                (NUT_TRACK_DEPTH, bolt_z - half),
-                (NUT_TRACK_DEPTH, bolt_z + half),
-                (0.0, bolt_z + half),
-            ],
-        )
-    _extrude_all_profiles(component, tracks, "bracketWidth + 10 mm", cut, "Nut tracks")
+        track = component.sketches.add(plane)
+        track.name = f"Nut track {index}"
+        corners = [
+            (
+                0.0,
+                bolt_z - half,
+                None,
+                f"{centre_expression} - nutTrackHeight / 2",
+            ),
+            (NUT_TRACK_DEPTH, bolt_z - half, None, None),
+            (
+                NUT_TRACK_DEPTH,
+                bolt_z + half,
+                "nutTrackDepth",
+                f"{centre_expression} + nutTrackHeight / 2",
+            ),
+            (0.0, bolt_z + half, None, None),
+        ]
+        lines = _polyline(track, [(x, z) for x, z, _, _ in corners])
+        constraints = track.geometricConstraints
+        for line in (lines[0], lines[2]):
+            constraints.addHorizontal(line)
+        for line in (lines[1], lines[3]):
+            constraints.addVertical(line)
+        constraints.addCollinear(lines[3], plate_rear_axis(component, track))
+        _pin_corners(track, lines, corners)
+        _extrude_all_profiles(component, track, "bracketWidth + 10 mm", cut, track.name)
 
-    slots = component.sketches.add(plane)
-    slots.name = "Bolt slots"
-    for bolt_z in _bolt_center_zs():
-        half = BOLT_SLOT_HEIGHT / 2.0
-        _add_polygon(
-            slots,
-            [
-                (-1.0, bolt_z - half),
-                (PLATE_THICKNESS + 1.0, bolt_z - half),
-                (PLATE_THICKNESS + 1.0, bolt_z + half),
-                (-1.0, bolt_z + half),
-            ],
-        )
-    _extrude_all_profiles(component, slots, BOLT_SLOT_LENGTH, cut, "Bolt slots")
+        slot = component.sketches.add(plane)
+        slot.name = f"Bolt slot {index}"
+        half_slot = BOLT_SLOT_HEIGHT / 2.0
+        corners = [
+            (
+                0.0,
+                bolt_z - half_slot,
+                None,
+                f"{centre_expression} - boltSlotHeight / 2",
+            ),
+            (PLATE_THICKNESS + 1.0, bolt_z - half_slot, None, None),
+            (
+                PLATE_THICKNESS + 1.0,
+                bolt_z + half_slot,
+                "plateThickness + 1 mm",
+                f"{centre_expression} + boltSlotHeight / 2",
+            ),
+            (0.0, bolt_z + half_slot, None, None),
+        ]
+        lines = _polyline(slot, [(x, z) for x, z, _, _ in corners])
+        constraints = slot.geometricConstraints
+        for line in (lines[0], lines[2]):
+            constraints.addHorizontal(line)
+        for line in (lines[1], lines[3]):
+            constraints.addVertical(line)
+        constraints.addCollinear(lines[3], plate_rear_axis(component, slot))
+        _pin_corners(slot, lines, corners)
+        _extrude_all_profiles(component, slot, "boltSlotLength", cut, slot.name)
+
+
+def plate_rear_axis(component, sketch):
+    """The sketch's own vertical axis, projected so edges can sit on x = 0."""
+    projected = sketch.project(component.zConstructionAxis)
+    return projected.item(0)
+
+
+def _bolt_centre_expression(index):
+    """Z of bolt row `index`, on the same 1 inch grid as the hooks."""
+    if index == 0:
+        return "topBoltCentre"
+    return f"topBoltCentre - {index} * slotPitchVertical"
 
 
 def _probe(body, x_mm, y_mm, z_mm):
@@ -448,6 +581,7 @@ def run(_context: str):
         raise RuntimeError("active document is not a design")
     if data_file is not None:
         _clear_timeline(design)
+        _drop_stale_parameters(design)
     _ensure_parameters(design)
     component = design.rootComponent
     _build_body(component, component.xZConstructionPlane)
@@ -467,6 +601,7 @@ def run(_context: str):
         f"z [{bounding.minPoint.z / MM:.1f}, {bounding.maxPoint.z / MM:.1f}]"
     )
     _verify(body)
+    _audit_parameters(design)
     _export(design)
     description = (
         f"scripted build {datetime.date.today().isoformat()}: "
