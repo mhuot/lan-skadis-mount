@@ -1,5 +1,10 @@
 # LAN Pegboard Mount
 
+Two ways to hang a board on the slotted DuraFrame uprights of an Ergotron
+LAN Organizer 3000: hardware-store pegboard bolted on, or an IKEA SKÅDIS
+hung on printed pegs. Both reuse the hook design already fit-verified on
+the real desk.
+
 Hangs standard 1/4"-hole pegboard on the slotted DuraFrame uprights of an
 Ergotron LAN Organizer 3000 — no drilling into the frame. Grown out of
 [lan-spool-shelf](../lan-spool-shelf); the hook design is the one already
@@ -39,3 +44,51 @@ python3 scripts/run_in_fusion.py scripts/build_pegboard_bracket.py
 Rebuilds into the "Pegboard Mount Bracket" document ("LAN Pegboard
 Mount" Fusion project), probes the geometry numerically, exports
 STL/STEP/F3D together, and saves a new document version.
+
+
+## SKÅDIS variant
+
+`scripts/build_skadis_bracket.py` builds a bracket that hooks the upright
+and carries two upward-opening pegs. Lower a SKÅDIS onto them — each slot's
+top edge rests on a peg root, and the prong in front of the board stops it
+tipping out. Lift 12 mm and pull forward to take it off. No bolts, no nuts.
+
+```sh
+python3 scripts/run_in_fusion.py scripts/build_skadis_bracket.py --variant left
+python3 scripts/run_in_fusion.py scripts/build_skadis_bracket.py --variant right
+```
+
+**Measure your uprights first.** The board's slot columns repeat every
+40 mm and your uprights are whatever they are — 711.2 mm nominal on a 30"
+frame. Since 711.2 is not a multiple of 40, the second bracket misses a
+column by 8.8 mm, and a peg is a fixed post with no adjustment. So the
+offset is built in: set `UPRIGHT_SPACING` at the top of the script, and it
+computes `pegOffsetY` for the right-hand brackets (0 for the left ones).
+Print two of each per board.
+
+| | |
+|---|---|
+| Bracket | 60 × 24 × 20.5 mm, ~8.6 cm³, ~9 g |
+| Board | SKÅDIS 4.6 mm thick, 5 × 15 mm slots, 40 mm grid |
+| Board face | lands 10 mm off the upright — same plane as the pegboard version, so it still works as a spool backstop |
+| Print | plate flat on the bed, hooks and pegs up; supports on build plate only |
+
+### Credit
+
+The idea of hanging a SKÅDIS on printed pegs rather than bolting through it
+comes from **[Skadis to Kallax mount adapter](https://www.printables.com/model/137113-skadis-to-kallax-mount-adapter)
+by WegBier**, licensed CC BY-NC-SA.
+
+That licence is incompatible with this repository's MIT licence — the
+NonCommercial term contradicts it outright, and ShareAlike would pull the
+whole repo off MIT — so **none of that model's geometry is reproduced
+here.** The peg is implemented independently from the published SKÅDIS
+interface dimensions, which describe IKEA's product rather than anyone's
+authorship, cross-checked against two unrelated OpenSCAD libraries:
+[franpoli/OpenSCADutil](https://github.com/franpoli/OpenSCADutil) and
+[TassSinclair/skadis](https://github.com/TassSinclair/skadis), which agree
+on 40 mm pitch, 5 mm slot width and 4.6 mm board thickness.
+
+If you want WegBier's adapter itself, print it from the link above — it
+mounts a SKÅDIS to a KALLAX, and personal use is squarely within its
+licence.

@@ -7,7 +7,9 @@ board, the pegboard doubles as a backstop the resting spools just graze.
 
 ## Source of truth
 
-- `scripts/build_pegboard_bracket.py` builds the one printed part. All
+- `scripts/build_pegboard_bracket.py` builds the bolt-through pegboard
+  bracket; `scripts/build_skadis_bracket.py` builds the SKÅDIS peg bracket
+  (`--variant left|right`, the right one carrying the computed peg offset). All
   dimensions live at the top of that file; no shared params module (see
   the module-caching trap in the fusion-360-mcp skill).
 - Slot geometry (3/4" slots, 1" pitch, ~1/8" wide, single column per
@@ -33,3 +35,12 @@ board, the pegboard doubles as a backstop the resting spools just graze.
 Flat on the side face, like the spool brackets: supports on build plate
 only (under the hook blades). ASA or PETG, 4 perimeters, 25% infill —
 loads are far below the spool cradle's.
+
+## Third-party models
+
+WegBier's "Skadis to Kallax mount adapter" (Printables 137113) inspired the
+SKÅDIS peg approach and is CC BY-NC-SA — incompatible with this repo's MIT
+licence. Its geometry is deliberately NOT reproduced; the peg is built from
+published SKÅDIS interface dimensions, which are measurements of IKEA's
+product. Keep it that way: cite inspiration, implement independently, and
+never paste a CC-BY-NC or -SA part into an MIT repo.
