@@ -87,6 +87,12 @@ PEG_BEARING_FILLET = 1.5  # the top edges the board actually lands on
 TOP_PEG_ROOT_Z = 45.0
 PEG_ROWS = 2
 PEG_EDGE_MARGIN = 1.6  # plate left either side of a peg
+# The pegs sit inboard, toward the middle of the desk, so that is the edge
+# they crowd. The plate grows on that side only: the hooks stay centred on
+# the upright's slot column (they have to), the outboard edge stays where it
+# was, and the extra material goes into the gap between the uprights where
+# nothing else lives.
+PLATE_INBOARD_EXTENSION = 4.0
 # The grid correction is split evenly between the two brackets, so they are
 # a mirrored pair: equal gap from each peg to its outer plate edge. Only the
 # DIFFERENCE between the two offsets is fixed by the board's column grid;
@@ -158,17 +164,37 @@ def _check_peg_geometry():
         )
 
 
+def plate_span():
+    """(outboard edge, inboard edge) of the plate in Y, mm.
+
+    Inboard is +Y on the left bracket and -Y on the right, so the pair
+    mirrors: each grows toward the middle of the desk.
+    """
+    half = BRACKET_WIDTH / 2.0
+    if BUILD_VARIANT == "left":
+        return -half, half + PLATE_INBOARD_EXTENSION
+    return half, -half - PLATE_INBOARD_EXTENSION
+
+
 def _check_peg_offset():
-    """A peg has to stay on the plate, with wall left either side of it."""
-    limit = BRACKET_WIDTH / 2.0 - PEG_WIDTH / 2.0 - PEG_EDGE_MARGIN
-    if abs(peg_offset()) > limit:
+    """A peg has to stay on the plate, with material left either side."""
+    outboard_edge, inboard_edge = plate_span()
+    low, high = sorted((outboard_edge, inboard_edge))
+    peg_low = peg_offset() - PEG_WIDTH / 2.0
+    peg_high = peg_offset() + PEG_WIDTH / 2.0
+    gaps = (peg_low - low, high - peg_high)
+    if min(gaps) < PEG_EDGE_MARGIN:
         raise RuntimeError(
-            f"pegOffsetY {peg_offset():+.1f} mm exceeds +/-{limit:.1f} mm for a "
-            f"{BRACKET_WIDTH:.0f} mm plate. Widen BRACKET_WIDTH to at least "
-            f"{2 * (abs(peg_offset()) + PEG_WIDTH / 2.0 + PEG_EDGE_MARGIN):.0f} mm, "
-            "remembering that over 25.4 mm two brackets can no longer sit side "
-            "by side at the module centre at the same height."
+            f"peg at {peg_offset():+.2f} mm leaves {min(gaps):.2f} mm of plate "
+            f"beside it, under the {PEG_EDGE_MARGIN} mm margin. Raise "
+            f"PLATE_INBOARD_EXTENSION (now {PLATE_INBOARD_EXTENSION} mm) or "
+            "widen BRACKET_WIDTH — but over 25.4 mm the outboard half stops "
+            "fitting between the two slot columns at the module centre."
         )
+    print(
+        f"  plate {min(low, high):+.1f}..{max(low, high):+.1f} mm, "
+        f"peg gaps {gaps[0]:.2f} / {gaps[1]:.2f} mm"
+    )
 
 
 def export_name():
@@ -220,6 +246,11 @@ def parameters():
         "topPegRootZ": (TOP_PEG_ROOT_Z, "mm", "top peg root, above the plate foot"),
         "pegRows": (str(PEG_ROWS), "", "pegs per bracket (pattern count)"),
         "pegOffsetY": (peg_offset(), "mm", "offset onto the board's 40 mm grid"),
+        "plateInboardExtension": (
+            PLATE_INBOARD_EXTENSION,
+            "mm",
+            "extra plate toward the desk centre, where the peg crowds",
+        ),
     }
 
 
@@ -327,12 +358,19 @@ def _build_plate(component, plane):
     for line in (lines[1], lines[3]):
         constraints.addVertical(line)
     _pin_corners(sketch, lines, corners)
+    # Asymmetric: bracketWidth centred on the hooks, plus the inboard
+    # extension. A symmetric extrude offset by half the extension gives
+    # exactly that, and inboard is +Y on the left bracket, -Y on the right.
+    inboard = 1.0 if BUILD_VARIANT == "left" else -1.0
     _extrude(
         component,
         sketch,
-        "bracketWidth",
+        "bracketWidth + plateInboardExtension",
         adsk.fusion.FeatureOperations.NewBodyFeatureOperation,
         "Plate",
+        offset_expression=(
+            "plateInboardExtension / 2" if inboard > 0 else "-plateInboardExtension / 2"
+        ),
     )
 
 
