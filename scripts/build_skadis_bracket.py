@@ -86,7 +86,7 @@ TOP_HOOK_NECK_TOP = PLATE_HEIGHT - 2.0
 # it. Sharing one parameter means loosening a tight peg also lets the board
 # rattle front-to-back, so they stay separate even at equal values.
 PEG_CLEARANCE = 0.3  # total across the slot width
-PEG_ROOT_PROUD = 0.3  # root beyond the board's front face
+PEG_ROOT_PROUD = 0.2  # root beyond the board's front face, as it was before
 PEG_WIDTH = BOARD_SLOT_WIDTH - PEG_CLEARANCE
 PEG_ROOT_LENGTH = BOARD_THICKNESS + PEG_ROOT_PROUD
 PEG_ROOT_HEIGHT = 4.0  # the slot's top edge bears on this
