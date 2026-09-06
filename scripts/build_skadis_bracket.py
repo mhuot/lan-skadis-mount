@@ -80,10 +80,17 @@ BRACKET_WIDTH = 24.0  # still fits the 25.4 gap at the module centre
 PLATE_THICKNESS = 5.4  # board face then lands 10.0 mm off the upright
 PLATE_HEIGHT = 60.0
 TOP_HOOK_NECK_TOP = PLATE_HEIGHT - 2.0
-PEG_WIDTH = BOARD_SLOT_WIDTH - 0.2  # 4.8, slides in the 5 mm slot
-PEG_ROOT_LENGTH = BOARD_THICKNESS + 0.2  # through the board
+# Two small numbers that look alike and are not. pegClearance is a sliding
+# fit: how easily the peg enters the slot. pegRootProud is a standoff: how
+# far the root pokes past the board's front face so the prong does not pinch
+# it. Sharing one parameter means loosening a tight peg also lets the board
+# rattle front-to-back, so they stay separate even at equal values.
+PEG_CLEARANCE = 0.3  # total across the slot width
+PEG_ROOT_PROUD = 0.3  # root beyond the board's front face
+PEG_WIDTH = BOARD_SLOT_WIDTH - PEG_CLEARANCE
+PEG_ROOT_LENGTH = BOARD_THICKNESS + PEG_ROOT_PROUD
 PEG_ROOT_HEIGHT = 4.0  # the slot's top edge bears on this
-PEG_PRONG_THICKNESS = 1.0  # sits in front of the board; 1 mm shorter overall
+PEG_PRONG_THICKNESS = 2.0  # sits in front of the board
 PEG_TOTAL_HEIGHT = BOARD_SLOT_HEIGHT - 4.0  # 11: prong rises 7 mm above the root
 PEG_PRONG_CHAMFER = 0.6  # lead-in; must stay under the prong thickness
 PEG_BEARING_FILLET = 1.5  # the top edges the board actually lands on
@@ -231,8 +238,14 @@ def parameters():
         "boardSlotWidth": (BOARD_SLOT_WIDTH, "mm", "SKADIS slot width"),
         "boardSlotHeight": (BOARD_SLOT_HEIGHT, "mm", "SKADIS slot height"),
         "boardPitch": (BOARD_PITCH, "mm", "SKADIS grid pitch"),
-        "pegWidth": ("boardSlotWidth - 0.2 mm", "mm", "peg width in the slot"),
-        "pegRootLength": ("boardThickness + 0.2 mm", "mm", "root through the board"),
+        "pegClearance": (PEG_CLEARANCE, "mm", "sliding fit across the slot"),
+        "pegRootProud": (PEG_ROOT_PROUD, "mm", "root past the board's front face"),
+        "pegWidth": ("boardSlotWidth - pegClearance", "mm", "peg width in the slot"),
+        "pegRootLength": (
+            "boardThickness + pegRootProud",
+            "mm",
+            "root through the board",
+        ),
         "pegRootHeight": (PEG_ROOT_HEIGHT, "mm", "slot top edge bears on this"),
         "pegProngThickness": (PEG_PRONG_THICKNESS, "mm", "prong in front of board"),
         "pegTotalHeight": (
