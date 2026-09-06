@@ -49,7 +49,13 @@ is the only cheap way to find out whether the nut and screw numbers below
 match the hardware actually in your hand.
 """
 
+# The whole part lives in one file on purpose: Fusion caches imported
+# modules AND globals across MCP runs, so a shared params module would
+# serve stale numbers. That trade costs a long module.
+# pylint: disable=too-many-lines
+
 import datetime
+import math
 
 import adsk.core
 import adsk.fusion
@@ -115,8 +121,6 @@ BRACKET_WIDTH = 24.0  # still fits the 25.4 gap at the module centre
 # DERIVED, not chosen: deep enough that a SCREW_LENGTH screw through a
 # BOARD_THICKNESS board stops SCREW_TIP_CLEARANCE short of the back face.
 PLATE_THICKNESS = SCREW_LENGTH - BOARD_THICKNESS - NUT_PROUD + SCREW_TIP_CLEARANCE
-PLATE_HEIGHT = 60.0
-TOP_HOOK_NECK_TOP = PLATE_HEIGHT - 2.0
 NUT_POCKET_DEPTH = NUT_THICKNESS - NUT_PROUD
 NUT_CHANNEL_HEIGHT = NUT_ACROSS_FLATS + NUT_CHANNEL_CLEARANCE
 SCREW_SLOT_WIDTH = SCREW_DIAMETER + SCREW_CLEARANCE
@@ -125,9 +129,31 @@ SCREW_SLOT_WIDTH = SCREW_DIAMETER + SCREW_CLEARANCE
 MOUNT_TRAVEL = 12.0
 NUT_CHANNEL_LENGTH = MOUNT_TRAVEL + NUT_ACROSS_FLATS + NUT_CHANNEL_CLEARANCE
 SCREW_SLOT_LENGTH = MOUNT_TRAVEL + SCREW_SLOT_WIDTH
-TOP_MOUNT_Z = 50.0
-MOUNT_ROWS = 2
+# ONE channel per bracket. A board hangs on four of these, two per upright,
+# so one channel each is already four screws in a rectangle -- and a second
+# channel would add a constraint rather than strength, because the two rows
+# on one bracket are pinned 40 mm apart with no way to take up error between
+# them. Spacing the brackets vertically instead puts that adjustment back in
+# the assembly, where it belongs: see bracket_spacing_options().
+MOUNT_ROWS = 1
 MOUNT_EDGE_MARGIN = 2.5  # plate left beyond the end of a channel
+# Plate height is DERIVED from whichever stack is taller, hooks or channels,
+# so dropping to one channel actually shortens the part instead of leaving
+# 12 mm of plate above a channel that is no longer there.
+HOOK_STACK_HEIGHT = (
+    2.0
+    + (HOOK_ROWS - 1) * SLOT_PITCH_VERTICAL
+    + HOOK_NECK_HEIGHT
+    + HOOK_LIP_DROP
+    + MOUNT_EDGE_MARGIN
+)
+MOUNT_STACK_HEIGHT = (
+    (MOUNT_ROWS - 1) * BOARD_PITCH + NUT_CHANNEL_HEIGHT + 2 * MOUNT_EDGE_MARGIN
+)
+PLATE_HEIGHT = 2.0 * math.ceil(max(HOOK_STACK_HEIGHT, MOUNT_STACK_HEIGHT) / 2.0)
+TOP_HOOK_NECK_TOP = PLATE_HEIGHT - 2.0
+# Centre the channel stack on the plate, whatever the row count.
+TOP_MOUNT_Z = (PLATE_HEIGHT + (MOUNT_ROWS - 1) * BOARD_PITCH) / 2.0
 PLATE_INBOARD_EXTENSION = 9.0
 SLOT_OVERSHOOT = 1.0  # cut profiles reach past the faces they cut
 BOARD_SHIFT = 0.0
@@ -155,6 +181,28 @@ def top_mount_z():
 def mount_rows():
     """Channel rows for this variant."""
     return 1 if _is_coupon() else MOUNT_ROWS
+
+
+def bracket_spacing_options(limit=9):
+    """Vertical spacings, in hook pitches, that two brackets can share.
+
+    With one channel per bracket the vertical alignment moves out of the
+    part and into the assembly, and the two grids do not agree: the upright
+    puts brackets on a 25.4 mm pitch and the board puts slots on 40 mm. A
+    screw has boardSlotHeight - screwDiameter of freedom inside its slot, so
+    a spacing works only if some whole number of board pitches lands inside
+    that. 2 x 25.4 = 50.8 against 40 misses by 10.8 of an available 11.0 and
+    is not a spacing to trust; 3 x 25.4 = 76.2 against 80 misses by 3.8.
+    """
+    play = BOARD_SLOT_HEIGHT - SCREW_DIAMETER
+    options = []
+    for pitches in range(1, limit + 1):
+        rise = pitches * SLOT_PITCH_VERTICAL
+        rows = max(1, round(rise / BOARD_PITCH))
+        miss = abs(rise - rows * BOARD_PITCH)
+        if miss <= play * 0.6:
+            options.append((pitches, rise, rows, miss))
+    return options
 
 
 def grid_correction():
@@ -229,6 +277,13 @@ def _check_mount_fits():
             f"ends {tip:.2f} mm from the plate's back face -- it would foul "
             "the upright's face metal"
         )
+    if not _is_coupon():
+        for pitches, rise, rows, miss in bracket_spacing_options():
+            print(
+                f"  stack two brackets {pitches} hook pitches apart "
+                f"({rise:.1f} mm) for {rows} board rows ({rows * BOARD_PITCH:.0f} mm), "
+                f"off by {miss:.1f} mm of {BOARD_SLOT_HEIGHT - SCREW_DIAMETER:.1f} mm"
+            )
     print(
         f"  plate {min(low, high):+.1f}..{max(low, high):+.1f} mm, "
         f"channel gaps {gaps[0]:.2f} / {gaps[1]:.2f} mm, "
