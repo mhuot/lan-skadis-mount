@@ -1,22 +1,28 @@
 # lan-pegboard-mount
 
-3D-printed brackets that hook into the slotted DuraFrame uprights of an
-Ergotron LAN Organizer 3000 and mount standard 1/4"-hole pegboard with
-1/4-20 bolts. Mounted behind a lan-spool-shelf cradle level with 1/8"
-board, the pegboard doubles as a backstop the resting spools just graze.
+3D-printed brackets that hang a board on the slotted DuraFrame uprights of
+an Ergotron LAN Organizer 3000. Two variants: an IKEA SKÅDIS on printed
+pegs (**the one in use, validated 2026-09-05**) and hardware-store pegboard
+bolted on with 1/4-20. Behind a lan-spool-shelf cradle level the board face
+lands 10 mm off the upright, so it doubles as a spool backstop.
 
 ## Source of truth
 
 - `scripts/build_pegboard_bracket.py` builds the bolt-through pegboard
   bracket; `scripts/build_skadis_bracket.py` builds the SKÅDIS peg bracket
-  (`--variant left|right`, the right one carrying the computed peg offset). All
-  dimensions live at the top of that file; no shared params module (see
-  the module-caching trap in the fusion-360-mcp skill).
+  (`--variant left|right`, a mirrored pair each carrying half the grid
+  correction). All dimensions live at the top of each file; no shared
+  params module (see the module-caching trap in the fusion-360-mcp skill).
+- Upright spacing is MEASURED, not nominal: `SLOT_INSIDE_GAP` = 731.84 mm
+  between the facing edges of the two slot columns, + one slot width =
+  735.04 mm centres, giving peg offsets of ±7.52 mm inboard. The nominal
+  28" would have been wrong in both size and direction.
 - Slot geometry (3/4" slots, 1" pitch, ~1/8" wide, single column per
   upright, hook throat = face metal 2.0 + 1.8 mm) was VERIFIED by printed
   gauges in ~/lan-spool-shelf — reuse changes from there deliberately.
 - Builds land in the Fusion cloud project **"LAN Pegboard Mount"** as the
-  document "Pegboard Mount Bracket"; each run saves a new version. EVERY
+  documents "Pegboard Mount Bracket", "SKADIS Bracket Left" and "SKADIS
+  Bracket Right"; each run saves a new version recording its body volume. EVERY
   user parameter drives geometry — hooks, plate, bolt slots and nut tracks
   alike — and the build fails if one goes inert or carries a wrong unit.
 
@@ -33,7 +39,8 @@ document from scratch, so a hand edit is something a rebuild would destroy:
 2. **An edit is a proposal.** Read the document, work out what changed, fold
    it into the script, rebuild, and confirm by matching volumes. The SKADIS
    peg fillet came from exactly this — the user moved it to the bearing
-   edges and the script now reproduces that at 9804 mm^3.
+   edges, and later a prong front fillet; the script reproduces the current
+   document exactly at 9892 mm^3.
 3. **Overwritten edits survive** as the prior version in `dataFile.versions`.
 4. `ALLOW_OVERWRITE = True` bypasses the guard; use it only deliberately.
 

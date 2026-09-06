@@ -46,33 +46,52 @@ Mount" Fusion project), probes the geometry numerically, exports
 STL/STEP/F3D together, and saves a new document version.
 
 
-## SKÅDIS variant
+## SKÅDIS variant  — the one in use
 
 `scripts/build_skadis_bracket.py` builds a bracket that hooks the upright
 and carries two upward-opening pegs. Lower a SKÅDIS onto them — each slot's
 top edge rests on a peg root, and the prong in front of the board stops it
-tipping out. Lift 12 mm and pull forward to take it off. No bolts, no nuts.
+tipping out. Lift ~11 mm and pull forward to take it off. No bolts, no nuts.
+
+**Validated 2026-09-05:** a board hangs on four of these, two pegs a side,
+both ends engaged.
 
 ```sh
 python3 scripts/run_in_fusion.py scripts/build_skadis_bracket.py --variant left
 python3 scripts/run_in_fusion.py scripts/build_skadis_bracket.py --variant right
 ```
 
-**Measure your uprights first.** The board's slot columns repeat every
-40 mm and your uprights are whatever they are — 711.2 mm nominal on a 30"
-frame. Since 711.2 is not a multiple of 40, the second bracket misses a
-column by 8.8 mm, and a peg is a fixed post with no adjustment. So the
-offset is built in: set `UPRIGHT_SPACING` at the top of the script, and it
-computes `pegOffsetY` for the right-hand brackets (0 for the left ones).
-Print two of each per board.
+### Measure your uprights — this is what sizes the pegs
+
+The board's slot columns repeat every 40 mm; your uprights are whatever they
+are. Only the *difference* between the two brackets' peg offsets is fixed:
+
+> uprightSpacing + rightOffset − leftOffset = a whole number of 40 mm columns
+
+Splitting that difference in half makes the pair mirror images with equal
+plate gaps, which is what `peg_offset()` does. Measure between the **facing
+edges of the two slot columns** (right edge of a left slot → left edge of a
+right slot) and set `SLOT_INSIDE_GAP`; the script adds one slot width to get
+centres, and derives everything else.
+
+On this desk: 28 13/16" = 731.84 mm between facing edges → **735.04 mm**
+centres → 15.04 mm past an 18-column span → each bracket's pegs sit
+**7.52 mm toward the middle** of the desk, and the engaged columns land
+720.00 mm apart. Nominal 28" would have given ±4.4 mm *outward* — the wrong
+size and the wrong direction, which is why this is measured, not assumed.
+
+Print **two of each** per board.
 
 | | |
 |---|---|
-| Bracket | 60 × 24 × 20.5 mm, ~8.8 cm³, ~9 g |
-| Rounding | 1.2 mm lead-in chamfer on the prong top (the board is lowered on blind); 1 mm fillet where each root meets the plate, top and bottom only — the sides stay sharp because the root is 4.8 mm in a 5 mm slot |
+| Bracket | 60 × 28 × 20.5 mm, 9.89 cm³, ~9.5 g in ASA |
+| Plate | 24 mm centred on the hooks plus 4 mm **inboard only**. The outboard half stays at 12 mm so two brackets still fit side by side on the two slot columns at the module centre, with 1.4 mm between them — a symmetric 28 mm plate would overlap by 2.6 mm. |
+| Peg | 4.70 mm wide in a 5.00 mm slot (`pegClearance` 0.3, set after a print that was too tight), root 4.80 mm through a 4.6 mm board, prong 2.0 mm |
+| Prong | 2.0 mm, not 1.0: it carries the board's tipping load over a 7 mm rise and bent under a hand push at 1.0 mm. A millimetre asked off the peg should come off the root or the rise, never off this. |
+| Rounding | 0.6 mm lead-in chamfer on the prong top (the board is lowered on blind); 1.5 mm fillet on the root's top side edges, where the board's slot edge actually bears; 1.0 mm fillet on the prong's front corners, the surface a hand meets |
 | Board | SKÅDIS 4.6 mm thick, 5 × 15 mm slots, 40 mm grid |
 | Board face | lands 10 mm off the upright — same plane as the pegboard version, so it still works as a spool backstop |
-| Print | **on its side**, the 24 mm face on the bed — same rule as the spool brackets. That puts the peg's bending stress along the layers instead of across them, and leaves essentially no overhangs. Printing it plate-flat stands each peg on a layer bond and a knock will snap one off. |
+| Print | **on its side**, the 28 mm face on the bed — same rule as the spool brackets. That puts the peg's bending stress along the layers instead of across them. Organic supports, build plate only: the hooks and pegs start ~10 mm up with nothing under them. Plate-flat stands each peg on a layer bond and a knock snaps one off. |
 
 ### Credit
 
