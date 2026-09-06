@@ -102,6 +102,7 @@ PEG_PRONG_THICKNESS = 2.0  # sits in front of the board
 PEG_TOTAL_HEIGHT = BOARD_SLOT_HEIGHT - 4.0  # 11: prong rises 7 mm above the root
 PEG_PRONG_CHAMFER = 0.6  # lead-in; must stay under the prong thickness
 PEG_BEARING_FILLET = 1.5  # the top edges the board actually lands on
+PEG_PRONG_FRONT_FILLET = 1.0  # the prong's two front corners, thumb-facing
 TOP_PEG_ROOT_Z = 45.0
 PEG_ROWS = 2
 PEG_EDGE_MARGIN = 1.6  # plate left either side of a peg
@@ -266,6 +267,11 @@ def parameters():
             PEG_BEARING_FILLET,
             "mm",
             "round on the root top edges the board bears on",
+        ),
+        "pegProngFrontFillet": (
+            PEG_PRONG_FRONT_FILLET,
+            "mm",
+            "round on the prong's front corners, where fingers meet it",
         ),
         "topPegRootZ": (TOP_PEG_ROOT_Z, "mm", "top peg root, above the plate foot"),
         "pegRows": (str(PEG_ROWS), "", "pegs per bracket (pattern count)"),
@@ -642,6 +648,42 @@ def _fillet_peg_roots(component, body):
     fillets.add(fillet_input).name = "Peg bearing fillets"
 
 
+def _fillet_prong_front(component, body):
+    """Round the two vertical corners of each prong's front face.
+
+    The outermost surface of the whole bracket, and the one a hand lands on
+    when pressing the board home — sharp printed corners there are the ones
+    you feel. Added by hand in the document (v9) and folded back here.
+    """
+    prong_end = PLATE_THICKNESS + PEG_ROOT_LENGTH + PEG_PRONG_THICKNESS
+    wanted_y = [peg_offset() - PEG_WIDTH / 2.0, peg_offset() + PEG_WIDTH / 2.0]
+    edges = adsk.core.ObjectCollection.create()
+    for index in range(body.edges.count):
+        edge = body.edges.item(index)
+        start = edge.startVertex.geometry
+        end = edge.endVertex.geometry
+        if abs(start.x - end.x) > 1e-6 or abs(start.y - end.y) > 1e-6:
+            continue  # must run along Z
+        if abs(start.z - end.z) < 1e-6:
+            continue
+        if abs(start.x / MM - prong_end) > 0.01:
+            continue  # must lie in the prong's front face
+        if not any(abs(start.y / MM - y) < 0.01 for y in wanted_y):
+            continue
+        edges.add(edge)
+    expected = 2 * PEG_ROWS
+    if edges.count != expected:
+        raise RuntimeError(
+            f"expected {expected} prong front edges to fillet, found {edges.count}"
+        )
+    fillets = component.features.filletFeatures
+    fillet_input = fillets.createInput()
+    fillet_input.addConstantRadiusEdgeSet(
+        edges, adsk.core.ValueInput.createByString("pegProngFrontFillet"), True
+    )
+    fillets.add(fillet_input).name = "Prong front fillets"
+
+
 def _probe(body, x_mm, y_mm, z_mm):
     point = adsk.core.Point3D.create(x_mm * MM, y_mm * MM, z_mm * MM)
     return body.pointContainment(point)
@@ -843,6 +885,7 @@ def _clear_timeline(design):
             raise RuntimeError("timeline item refused to delete")
 
 
+# pylint: disable-next=too-many-statements
 def run(_context: str):
     """Build the bracket into its saved document, verify, export, version."""
     if BUILD_VARIANT not in ("left", "right"):
@@ -872,6 +915,7 @@ def run(_context: str):
     if component.bRepBodies.count != 1:
         raise RuntimeError(f"expected one body, got {component.bRepBodies.count}")
     _fillet_peg_roots(component, component.bRepBodies.item(0))
+    _fillet_prong_front(component, component.bRepBodies.item(0))
 
     if component.bRepBodies.count != 1:
         raise RuntimeError(f"expected one body, got {component.bRepBodies.count}")
