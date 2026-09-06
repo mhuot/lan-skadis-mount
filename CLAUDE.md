@@ -20,6 +20,23 @@ board, the pegboard doubles as a backstop the resting spools just graze.
   user parameter drives geometry — hooks, plate, bolt slots and nut tracks
   alike — and the build fails if one goes inert or carries a wrong unit.
 
+## Working with the Fusion documents
+
+Fusion is the surface Mike interacts with. The scripts still regenerate a
+document from scratch, so a hand edit is something a rebuild would destroy:
+
+1. **Never rebuild over an edit.** Each build script checks the latest
+   version before clearing the timeline. A human's save is labelled
+   `User Saved`; a scripted save starts with `scripted` and records the body
+   volume. The build refuses only when a human save AND divergent geometry
+   coincide, so an ordinary save is not a nuisance.
+2. **An edit is a proposal.** Read the document, work out what changed, fold
+   it into the script, rebuild, and confirm by matching volumes. The SKADIS
+   peg fillet came from exactly this — the user moved it to the bearing
+   edges and the script now reproduces that at 9804 mm^3.
+3. **Overwritten edits survive** as the prior version in `dataFile.versions`.
+4. `ALLOW_OVERWRITE = True` bypasses the guard; use it only deliberately.
+
 ## Which scripts run where
 
 - **Fusion 360 only**: `scripts/build_pegboard_bracket.py`, via
