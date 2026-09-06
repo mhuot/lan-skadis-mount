@@ -85,11 +85,19 @@ TOP_HOOK_NECK_TOP = PLATE_HEIGHT - 2.0
 # far the root pokes past the board's front face so the prong does not pinch
 # it. Sharing one parameter means loosening a tight peg also lets the board
 # rattle front-to-back, so they stay separate even at equal values.
+# Both of these came from a printed part in a real board, 2026-09-05:
+# the peg was too tight left-to-right in the slot, so the width clearance
+# went from 0.2 to 0.3 (peg 4.70 in a 5.00 slot, 0.15 a side).
 PEG_CLEARANCE = 0.3  # total across the slot width
-PEG_ROOT_PROUD = 0.2  # root beyond the board's front face, as it was before
+PEG_ROOT_PROUD = 0.2  # root beyond the board's front face
 PEG_WIDTH = BOARD_SLOT_WIDTH - PEG_CLEARANCE
 PEG_ROOT_LENGTH = BOARD_THICKNESS + PEG_ROOT_PROUD
 PEG_ROOT_HEIGHT = 4.0  # the slot's top edge bears on this
+# 2.0, not 1.0: the prong is what stops the board tipping out, so it is
+# loaded in bending over its 7 mm rise. At 1.0 it bent under a hand push —
+# section modulus 0.78 mm^3, about 90 MPa at only 10 N, past what ASA takes.
+# 2.0 is four times stiffer. A millimetre asked off the peg should come off
+# the root or the rise, never off this.
 PEG_PRONG_THICKNESS = 2.0  # sits in front of the board
 PEG_TOTAL_HEIGHT = BOARD_SLOT_HEIGHT - 4.0  # 11: prong rises 7 mm above the root
 PEG_PRONG_CHAMFER = 0.6  # lead-in; must stay under the prong thickness
