@@ -14,14 +14,14 @@ variant; git history has it if it is ever wanted back.
 
 The joint this builds:
 
-  * A DIN 562 M4 square nut lives in a cavity INSIDE the plate, enclosed on
-    the board side by nutWallThickness of solid material. The cavity is
+  * An M4 square nut, measured 7 x 7 x 3 mm, lives in a cavity INSIDE the
+    plate, enclosed on the board side by nutWallThickness of solid material. The cavity is
     nutChannelHeight tall against a 7.0 mm nut, well under its 9.9 mm
     diagonal, so the nut cannot rotate and the screw is tightened one-handed
     from the front.
   * The cavity breaks out of the plate's OUTBOARD EDGE and nowhere else, so
     the nut slides in from the side with the bracket in your hand, before it
-    ever goes on the desk. VERIFIED 2026-09-06: the nut fits the cavity.
+    ever goes on the desk.
   * The cavity is mountTravel longer than the nut. That length IS the
     left-right adjustment: slide, then tighten.
   * The IKEA decorative M4 screw goes in from the front, through the board,
@@ -115,10 +115,19 @@ assert HOOK_NECK_HEIGHT + HOOK_LIP_DROP < SLOT_HEIGHT - 1.0, "hook will not ente
 # --- Fastener, from the hardware in hand -----------------------------------
 # VERIFY THESE ON THE COUPON BEFORE PRINTING BRACKETS. Nut figures are
 # DIN 562 M4 nominal; the screw length is measured.
+# MEASURED 2026-09-07: 7 x 7 x 3 mm. That is a DIN 557 pattern square nut,
+# not the thin DIN 562 (2.2 mm) these were first built around -- a mistake the
+# open channel hid, because a pocket open to the board does not care how thick
+# the nut is. An enclosed cavity does: 0.8 mm too shallow and it will not
+# close.
 NUT_ACROSS_FLATS = 7.0
-NUT_THICKNESS = 2.2
+NUT_THICKNESS = 3.0
 NUT_CHANNEL_CLEARANCE = 0.4  # across flats and along the channel
-NUT_CAVITY_CLEARANCE = 0.3  # across the nut's thickness
+# Depth clearance is deliberately the loosest of the three. The screw pulls
+# the nut forward onto the wall, so a cavity deeper than the nut costs
+# nothing, while one shallower than the nut is scrap. 0.4 also covers a
+# DIN 557 at its 3.2 mm maximum.
+NUT_CAVITY_CLEARANCE = 0.4
 # The wall left in FRONT of the nut. This is the whole point of a captured
 # cavity: the nut is enclosed, the screw pulls it forward against this wall,
 # and the board is clamped between the screw head and a flat plate face. The

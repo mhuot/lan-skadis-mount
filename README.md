@@ -24,7 +24,8 @@ desk.
 
 ### The joint
 
-A **DIN 562 M4 square nut** lives in a cavity *inside* the plate:
+An **M4 square nut**, measured 7 × 7 × 3 mm, lives in a cavity *inside* the
+plate:
 
 - The cavity is enclosed on the board side by **4 mm of solid wall**. The
   board lands on a flat face; nothing but the screw slot breaks it.
@@ -54,7 +55,9 @@ every one that was measured has held. These are the measured ones.
 | SKÅDIS slot | 5 × 15 mm on a 40 mm grid | second grid offset 20 mm both ways |
 | Decorative M4 screw | **15 mm** | the one IKEA ships |
 
-A DIN 562 M4 square nut is confirmed to fit the cavity as built.
+The nut is a DIN 557 pattern at 7 × 7 × 3 mm, not the thin DIN 562 (2.2 mm)
+this was first built around. An open channel hid that — a pocket facing the
+board does not care how thick the nut is. An enclosed cavity does.
 
 ## The plate thickness is derived, not chosen
 
@@ -150,7 +153,7 @@ Each run exports `cad/*.step`, `cad/*.f3d` and `exports/*.stl` together, so
 they cannot drift apart. Locally, in `.venv`:
 
 ```sh
-.venv/bin/python scripts/check_stl.py exports/skadis_nut_left.stl 16864
+.venv/bin/python scripts/check_stl.py exports/skadis_nut_left.stl 16529
 .venv/bin/python scripts/build_web_assets.py       # the GLBs the page loads
 .venv/bin/python scripts/render_part.py exports/skadis_nut_left.stl out.png
 ```

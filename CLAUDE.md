@@ -4,7 +4,10 @@
 an Ergotron LAN Organizer 3000. Two designs: the **SKÅDIS captured-nut
 bracket (current)** and hardware-store pegboard bolted on with 1/4-20.
 
-An M4 square nut lives in a cavity INSIDE the plate, closed on the board
+An M4 square nut, MEASURED 7 x 7 x 3 mm (a DIN 557 pattern, not the thin
+DIN 562 at 2.2 that this was first built around -- the open channel hid the
+error because a pocket facing the board does not care how thick the nut is),
+lives in a cavity INSIDE the plate, closed on the board
 side by a 4 mm wall and open only at the plate's outboard edge, which is
 where it slides in. 12 mm of slide = the left-right adjustment, so the board
 is positioned at assembly rather than at slicing. Tightening pulls the nut
@@ -86,7 +89,9 @@ document from scratch, so a hand edit is something a rebuild would destroy:
   --variant left` (MCP server at 127.0.0.1:27182; Fusion must be running).
 - **Locally, in `.venv`**: `scripts/check_stl.py` (mesh vs the volume the
   build printed), `scripts/build_web_assets.py` (the two GLBs the Pages site
-  loads), `scripts/render_part.py` (the stills) and `scripts/stamp_assets.py`.
+  loads), `scripts/render_part.py` (the stills), `scripts/build_joint_diagram.py`
+  (the section drawing on the page, generated from the build script's own
+  constants so it cannot drift) and `scripts/stamp_assets.py`.
   Run stamp_assets after ANY of the other two: Pages caches models and images
   hard, so a corrected GLB kept rendering the old geometry on a phone that had
   loaded the page before, with current HTML beside it and nothing visibly
