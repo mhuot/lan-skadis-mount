@@ -5,3 +5,4 @@ __pycache__/
 .DS_Store
 exports/skadis_one_*.stl
 exports/skadis_two_*.stl
+exports/skadis_nut_pair.stl
