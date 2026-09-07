@@ -86,7 +86,12 @@ document from scratch, so a hand edit is something a rebuild would destroy:
   --variant left` (MCP server at 127.0.0.1:27182; Fusion must be running).
 - **Locally, in `.venv`**: `scripts/check_stl.py` (mesh vs the volume the
   build printed), `scripts/build_web_assets.py` (the two GLBs the Pages site
-  loads) and `scripts/render_part.py` (the stills).
+  loads), `scripts/render_part.py` (the stills) and `scripts/stamp_assets.py`.
+  Run stamp_assets after ANY of the other two: Pages caches models and images
+  hard, so a corrected GLB kept rendering the old geometry on a phone that had
+  loaded the page before, with current HTML beside it and nothing visibly
+  wrong. It rewrites each local asset URL as ?v=<content hash>, so the URL
+  changes exactly when the bytes do. It is idempotent.
 - **Fusion, any time**: `scripts/audit_parameters.py` — every parameter must
   drive geometry, carry the right unit, and every sketch should be fully
   constrained. The build script audits itself too.
