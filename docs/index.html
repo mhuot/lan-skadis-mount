@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAN SKÅDIS Mount</title>
+<meta name="description" content="3D printed brackets that hang an IKEA SKÅDIS pegboard on the slotted uprights of an Ergotron LAN Organizer 3000. No drilling, no wall. Free files, MIT licensed.">
+<meta property="og:title" content="LAN SKÅDIS Mount">
+<meta property="og:description" content="Hang a SKÅDIS pegboard on an old Ergotron desk frame. Square nut in a sliding channel, so the board is aligned at assembly instead of at slicing.">
+<meta property="og:type" content="website">
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --text: #1a1d21;
+    --muted: #5b6470;
+    --accent: #c62a22;
+    --link: #2563eb;
+    --border: #e2e6eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101216;
+      --panel: #181b21;
+      --text: #e8eaed;
+      --muted: #9aa3af;
+      --accent: #ef4444;
+      --link: #60a5fa;
+      --border: #2a2f38;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 880px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+  header { padding: 3rem 0 1rem; }
+  h1 { font-size: 2rem; letter-spacing: -0.02em; line-height: 1.2; }
+  .tagline { color: var(--muted); margin-top: 0.5rem; font-size: 1.1rem; }
+  h2 { font-size: 1.3rem; margin: 2.5rem 0 0.75rem; letter-spacing: -0.01em; }
+  h3 { font-size: 1.05rem; margin: 1.6rem 0 0.4rem; }
+  p { margin: 0.9rem 0; }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  model-viewer {
+    width: 100%;
+    height: min(58vh, 520px);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-top: 1.5rem;
+  }
+  .hint { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 0.5rem 0 0; }
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.25rem 0; }
+  .shots img {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  .shots figure { margin: 0; }
+  .shots figcaption { color: var(--muted); font-size: 0.82rem; padding: 0.4rem 0 0; }
+  @media (max-width: 640px) { .shots { grid-template-columns: 1fr; } }
+  .cta {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    padding: 0.7rem 1.3rem;
+    border-radius: 10px;
+    margin-top: 0.5rem;
+  }
+  .cta:hover { text-decoration: none; filter: brightness(1.07); }
+  ul { margin: 0.9rem 0 0.9rem 1.4rem; }
+  li { margin: 0.35rem 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.1rem 0;
+    font-size: 0.93rem;
+  }
+  th, td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.85rem; }
+  td.num { white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+  .pill {
+    display: inline-block; font-size: 0.75rem; font-weight: 600;
+    color: var(--accent); border: 1px solid currentColor;
+    border-radius: 999px; padding: 0.1rem 0.55rem; vertical-align: 0.1em;
+  }
+  footer {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  main img { max-width: 100%; height: auto; display: block; }
+  figure { margin: 1.5rem 0; }
+  figure img {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  figcaption { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 0.5rem 0 0; }
+
+  [data-zoom] { cursor: zoom-in; }
+  .zoomable { position: relative; }
+  .zoomable::after {
+    content: "click to enlarge";
+    position: absolute; right: 0.6rem; top: 0.6rem;
+    background: rgba(8,10,13,0.68); color: #fff;
+    font-size: 0.72rem; padding: 0.22rem 0.5rem; border-radius: 6px;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+  }
+  .zoomable:hover::after, .zoomable:focus-within::after { opacity: 1; }
+  @media (hover: none) { .zoomable::after { content: "tap to enlarge"; opacity: 1; } }
+
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(8,10,13,0.95);
+    display: none; overflow: auto;
+    padding: 3.25rem 1rem 2.5rem;
+  }
+  .lightbox.is-open { display: block; }
+  .lightbox img {
+    display: block; margin: 0 auto;
+    max-width: none; height: auto;
+    cursor: zoom-out; border-radius: 6px;
+  }
+  .lightbox-close {
+    position: fixed; top: 0.6rem; right: 0.8rem;
+    background: rgba(255,255,255,0.12); color: #fff;
+    border: 1px solid rgba(255,255,255,0.3); border-radius: 8px;
+    font: inherit; font-size: 0.9rem; line-height: 1;
+    padding: 0.5rem 0.8rem; cursor: pointer;
+  }
+  .lightbox-close:hover { background: rgba(255,255,255,0.22); }
+  .lightbox-caption {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    text-align: center; color: #cfd6de; font-size: 0.82rem;
+    padding: 0.7rem 1rem;
+    background: linear-gradient(transparent, rgba(8,10,13,0.92));
+    pointer-events: none;
+  }
+  body.lightbox-open { overflow: hidden; }
+  pre {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+    overflow-x: auto;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .ok { color: #15803d; font-weight: 600; }
+  .no { color: var(--accent); font-weight: 600; }
+  @media (prefers-color-scheme: dark) { .ok { color: #4ade80; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>A pegboard on a desk frame that was never meant to have one.</h1>
+    <p class="tagline">3D printed brackets that hook into the slotted uprights of an Ergotron LAN Organizer 3000 and hang an IKEA SKÅDIS on them. No drilling, no wall, no rail. Free files, MIT licensed.</p>
+  </header>
+
+  <model-viewer
+    src="models/skadis-mount.glb"
+    alt="3D model of a SKÅDIS pegboard hanging on four red printed brackets hooked into two steel uprights"
+    camera-controls
+    auto-rotate
+    auto-rotate-delay="1500"
+    rotation-per-second="16deg"
+    shadow-intensity="0.8"
+    exposure="1.05"
+    camera-orbit="68deg 80deg 82%"
+    interaction-prompt="none">
+  </model-viewer>
+  <p class="hint">Drag to spin, scroll to zoom. Four red brackets, two per upright — orbit around the back to see them.</p>
+
+  <h2>Why this exists</h2>
+  <p>An Ergotron LAN Organizer 3000 is a 2004-vintage steel desk frame with punched slots up every upright. It already holds a <a href="https://github.com/mhuot/lan-spool-shelf">filament spool shelf</a>; the obvious next thing to hang on it is somewhere to put tools. IKEA's SKÅDIS is cheap and the accessory ecosystem is enormous, but it is designed to be screwed to a wall, and the whole point of the Ergotron is that nothing gets drilled.</p>
+  <p>So the board needs to hang on the slots that are already there. The hook that grips the upright is the one already fit-verified on the real desk by the spool shelf's gauge prints, which meant the only genuinely new problem was how the board attaches to the bracket.</p>
+
+  <h2>The joint</h2>
+  <p>A <strong>DIN 562 M4 square nut</strong> is 2.2&nbsp;mm thick and 7&nbsp;mm across the flats, and a SKÅDIS slot is 5&nbsp;×&nbsp;15&nbsp;mm. So the nut feeds edgewise through a slot, turns flat behind the board, and drops into a horizontal channel milled into the face of the bracket. IKEA's own decorative M4 screw goes in from the front, through the board, into that nut.</p>
+  <div class="shots">
+    <figure>
+      <img src="images/nut_bracket_front.png" alt="Front of the bracket: a horizontal channel with a screw relief slot through the middle of it" loading="lazy" data-zoom>
+      <figcaption>Front. The channel the nut slides in, with the screw relief running straight through to the back.</figcaption>
+    </figure>
+    <figure>
+      <img src="images/nut_bracket_hooks.png" alt="Back of the bracket: two blade hooks that enter the upright's slots" loading="lazy" data-zoom>
+      <figcaption>Back. Two blade hooks drop into the upright's punched slots and take the whole load.</figcaption>
+    </figure>
+  </div>
+  <p>Three things make that channel work rather than merely fit:</p>
+  <ul>
+    <li>It is <strong>12&nbsp;mm longer than the nut</strong>, and that length is the left-right adjustment. Slide the board where you want it, then tighten.</li>
+    <li>It is <strong>7.4&nbsp;mm tall against a 7.0&nbsp;mm nut</strong> — comfortably under the nut's 9.9&nbsp;mm diagonal — so the nut cannot rotate and you can tighten the screw one-handed from the front.</li>
+    <li>The nut stands <strong>0.2&nbsp;mm proud</strong> of its pocket, so tightening clamps it against the channel floor. Flush or recessed and it slides straight back out of the adjustment you just made.</li>
+  </ul>
+
+  <model-viewer
+    src="models/nut-bracket.glb"
+    alt="3D model of a single printed bracket: a plate with two hooks on the back and a nut channel across the front"
+    camera-controls
+    auto-rotate
+    auto-rotate-delay="1200"
+    rotation-per-second="20deg"
+    shadow-intensity="0.75"
+    exposure="1.05"
+    camera-orbit="55deg 72deg 105%"
+    interaction-prompt="none">
+  </model-viewer>
+  <p class="hint">The part you actually print. 33&nbsp;×&nbsp;48&nbsp;mm, 11&nbsp;mm thick, about 8&nbsp;g in ASA.</p>
+
+  <h2>What the ruler got wrong</h2>
+  <p>Every dimension in this project that was assumed turned out to be wrong, and every one that was measured has held. Two of the measured ones rewrote the part.</p>
+  <p><strong>The board is 6.0&nbsp;mm, not 4.6.</strong> Both community SKÅDIS libraries quote 4.6&nbsp;mm, and an earlier version of this bracket believed them — it built its pegs as <code>boardThickness + 0.2</code>, so against a real board they finished <em>1.4&nbsp;mm short of reaching through it</em> and the retaining prong clamped the board instead of standing clear in front of it.</p>
+  <p><strong>The decorative screw is 15&nbsp;mm.</strong> Through a 6&nbsp;mm board that leaves 9&nbsp;mm of screw behind the board with nowhere to go. The old 5.4&nbsp;mm plate would have let the tip stand proud of its own back face and jam against the upright's steel. So the plate thickness is not a choice — it is derived:</p>
+  <pre><code>plateThickness = screwLength - boardThickness - nutProud + screwTipClearance
+               = 15.0 - 6.0 - 0.2 + 2.2
+               = 11.0 mm</code></pre>
+  <p>Change the screw and the plate follows. The build refuses outright if the tip would come within 0.5&nbsp;mm of the back face.</p>
+  <p>There is a happy side effect. Bending stiffness goes as thickness cubed, so 5.4&nbsp;→&nbsp;11.0&nbsp;mm is <strong>8.5× stiffer</strong> out of plane. At the worst nut position a bracket's share of a 15&nbsp;kg loaded board comes to 0.118&nbsp;MPa against ASA's ~45&nbsp;MPa — a 380× margin — which is why the plate carries no stiffening rib. It would be holding up nothing.</p>
+
+  <h2>Two grids that do not agree</h2>
+  <p>One channel per bracket, four brackets per board, two per upright. That moves vertical alignment out of the printed part and into the assembly — where the upright's <strong>25.4&nbsp;mm</strong> slot pitch has to meet the board's <strong>40&nbsp;mm</strong> one. A screw has 11&nbsp;mm of freedom inside its 15&nbsp;mm slot, and that is the entire budget:</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Brackets apart</th><th>Nearest board rows</th><th>Mismatch</th><th></th></tr></thead>
+    <tbody>
+      <tr><td class="num">3 × 25.4 = <strong>76.2 mm</strong></td><td class="num">2 × 40 = 80 mm</td><td class="num">3.8 mm</td><td class="ok">works</td></tr>
+      <tr><td class="num">8 × 25.4 = <strong>203.2 mm</strong></td><td class="num">5 × 40 = 200 mm</td><td class="num">3.2 mm</td><td class="ok">works, better leverage</td></tr>
+      <tr><td class="num">2 × 25.4 = 50.8 mm</td><td class="num">1 × 40 = 40 mm</td><td class="num">10.8 mm</td><td class="no">of 11.0 available</td></tr>
+      <tr><td class="num">1 × 25.4 = 25.4 mm</td><td class="num">1 × 40 = 40 mm</td><td class="num">14.6 mm</td><td class="no">no</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>The build script prints that list on every run, so it cannot be lost in a README nobody rereads. The left and right brackets are mirrored, each putting its channel 7.52&nbsp;mm toward the middle of the desk — which is where the board's nearest slot column falls at the measured 735.04&nbsp;mm upright spacing.</p>
+
+  <h2>Printing</h2>
+  <p>Lay the bracket on a side face, <code>--rotate-x 90</code>, so the hook profile is drawn inside every layer instead of stacked across them. In that orientation the channel and the screw relief need <strong>no support at all</strong> — they run along the build direction — and organic supports grow only under the two hooks, from the bed up to about 23&nbsp;mm.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Setting</th><th>Value</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Material</td><td class="num">ASA</td><td>creeps less than PETG under the hooks' permanent tension; PETG is fine for a fit test</td></tr>
+      <tr><td>Perimeters</td><td class="num">4</td><td>stock "STRUCTURAL" profiles ship thinner than this</td></tr>
+      <tr><td>Infill</td><td class="num">40%</td><td>the hooks carry the whole board</td></tr>
+      <tr><td>Supports</td><td class="num">organic, 0.25 mm gap</td><td>PETG welds itself to organic supports at the stock 0.2</td></tr>
+      <tr><td>Per bracket</td><td class="num">~8 g, 35–40 min</td><td>four brackets to a board</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>One thing to watch: the supports touch the <em>side face of the hook tabs</em>, which is the face that enters the slot. Put a caliper on a tab after cleanup — nominal 2.4&nbsp;mm, and it has to stay under about 2.6&nbsp;mm to enter a 3.2&nbsp;mm slot.</p>
+
+  <h2>What it replaced <span class="pill">history</span></h2>
+  <p>The first design hung the board on printed pegs: no bolts, no nuts, lower the board on and lift it off. It worked — a board hung on four of them with both ends engaged — and it is still in the repo as <code>build_skadis_bracket.py</code>.</p>
+  <p>It was replaced because it has no adjustment anywhere. Four rigid posts have to enter four slots at once, so every error in the upright measurement, in print shrinkage, and in the board's own tolerance lands on whoever is holding the board. It came out 3–5&nbsp;mm off left to right, and there was nothing to turn. A nut in a channel is a worse-looking joint and a far better one.</p>
+
+  <h2>Get the files</h2>
+  <p>STL, STEP and F3D for every part, plus the Fusion 360 scripts that generate them. Every user parameter drives geometry, with lengths in millimetres, angles in degrees and counts unitless — the build fails if that stops being true.</p>
+  <p><a class="cta" href="https://github.com/mhuot/lan-skadis-mount">Repository on GitHub</a></p>
+
+  <h2>Attribution</h2>
+  <p>The idea of hanging a SKÅDIS on printed pegs rather than bolting through it comes from <a href="https://www.printables.com/model/137113-skadis-to-kallax-mount-adapter">Skadis to Kallax mount adapter</a> by <strong>WegBier</strong>, licensed CC BY-NC-SA. That licence is incompatible with this repository's MIT licence, so none of that model's geometry is reproduced here — and the current design does not use a peg at all.</p>
+  <p>SKÅDIS interface dimensions are measurements of IKEA's product rather than anyone's authorship, cross-checked against <a href="https://github.com/franpoli/OpenSCADutil">franpoli/OpenSCADutil</a> and <a href="https://github.com/TassSinclair/skadis">TassSinclair/skadis</a>, then re-measured on the board itself.</p>
+</main>
+<footer>
+  MIT licensed. IKEA, SKÅDIS, Ergotron and DuraFrame are trademarks of their respective owners; this project is not affiliated with either company. Built with Fusion 360 through its local MCP server.
+</footer>
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox-close" type="button">Close</button>
+  <img id="lightbox-image" src="" alt="">
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
+
+<script>
+(function () {
+  var box = document.getElementById('lightbox');
+  var full = document.getElementById('lightbox-image');
+  var caption = document.getElementById('lightbox-caption');
+  var closer = box.querySelector('.lightbox-close');
+  var opener = null;
+  box.hidden = false;
+
+  function describe(img) {
+    var figure = img.closest('figure');
+    var text = figure && figure.querySelector('figcaption');
+    return text ? text.textContent : (img.alt || '');
+  }
+
+  function open(img) {
+    full.src = img.currentSrc || img.src;
+    full.alt = img.alt || '';
+    caption.textContent = describe(img);
+    box.classList.add('is-open');
+    document.body.classList.add('lightbox-open');
+    box.scrollTop = 0;
+    box.scrollLeft = Math.max(0, (full.naturalWidth - box.clientWidth) / 2);
+    opener = img;
+    closer.focus();
+  }
+
+  function close() {
+    box.classList.remove('is-open');
+    document.body.classList.remove('lightbox-open');
+    if (opener) { opener.focus(); }
+  }
+
+  full.addEventListener('load', function () {
+    if (box.classList.contains('is-open')) {
+      box.scrollLeft = Math.max(0, (full.naturalWidth - box.clientWidth) / 2);
+    }
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-zoom]'), function (img) {
+    img.tabIndex = 0;
+    img.addEventListener('click', function () { open(img); });
+    img.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        open(img);
+      }
+    });
+  });
+
+  closer.addEventListener('click', close);
+  box.addEventListener('click', function (event) {
+    if (event.target !== closer) { close(); }
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && box.classList.contains('is-open')) { close(); }
+  });
+})();
+</script>
+</body>
+</html>

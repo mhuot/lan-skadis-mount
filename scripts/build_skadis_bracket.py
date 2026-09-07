@@ -43,7 +43,7 @@ BUILD_VARIANT = "left"
 # Set True only to deliberately discard a hand edit in the document.
 ALLOW_OVERWRITE = False
 
-PROJECT_DIR = "/Users/mhuot/lan-pegboard-mount"
+PROJECT_DIR = "/Users/mhuot/lan-skadis-mount"
 FUSION_PROJECT_NAME = "LAN Pegboard Mount"
 
 # --- Upright, measured and confirmed by the spool shelf gauge prints --------
