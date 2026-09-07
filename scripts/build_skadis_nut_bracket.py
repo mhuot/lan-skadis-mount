@@ -125,7 +125,7 @@ NUT_CAVITY_CLEARANCE = 0.3  # across the nut's thickness
 # earlier open channel had no wall at all -- the nut sat in a pocket the
 # board covered, so the board had to be held off the plate by the nut, and
 # the nut had to be fed through a board slot with the board already up.
-NUT_WALL_THICKNESS = 3.0
+NUT_WALL_THICKNESS = 4.0
 SCREW_LENGTH = 15.0  # MEASURED: IKEA SKADIS decorative M4
 SCREW_DIAMETER = 4.0
 SCREW_CLEARANCE = 0.8

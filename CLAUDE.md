@@ -5,7 +5,7 @@ an Ergotron LAN Organizer 3000. Two designs: the **SKÅDIS captured-nut
 bracket (current)** and hardware-store pegboard bolted on with 1/4-20.
 
 An M4 square nut lives in a cavity INSIDE the plate, closed on the board
-side by a 3 mm wall and open only at the plate's outboard edge, which is
+side by a 4 mm wall and open only at the plate's outboard edge, which is
 where it slides in. 12 mm of slide = the left-right adjustment, so the board
 is positioned at assembly rather than at slicing. Tightening pulls the nut
 forward onto the wall and clamps the board between the screw head and a flat

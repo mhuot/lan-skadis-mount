@@ -26,7 +26,7 @@ desk.
 
 A **DIN 562 M4 square nut** lives in a cavity *inside* the plate:
 
-- The cavity is enclosed on the board side by **3 mm of solid wall**. The
+- The cavity is enclosed on the board side by **4 mm of solid wall**. The
   board lands on a flat face; nothing but the screw slot breaks it.
 - It breaks out of the plate's **outboard edge and nowhere else**, so the
   nut slides in from the side with the bracket in your hand, before it ever
