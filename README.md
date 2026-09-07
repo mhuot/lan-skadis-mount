@@ -123,11 +123,17 @@ drawn inside every layer instead of stacked across them. In that orientation
 **the cavity and the screw slot need no support at all** (they run along the
 build direction), and organic supports grow only under the two hooks.
 
-Put the **outboard edge on the bed** so the cavity opens downward and prints
-as a plain vertical channel; the other way up its ceiling is an unsupported
-overhang. That is `--rotate-x 90` for the **left** bracket and
-`--rotate-x -90` for the **right** — the two hands are mirrored, so they do
-not share a rotation.
+Put the **inboard edge on the bed**, so the cavity's blind end is at the
+bottom and its mouth opens at the top. That is `--rotate-x -90` for the
+**left** bracket and `--rotate-x 90` for the **right** — the two hands are
+mirrored, so they do not share a rotation.
+
+Getting this backwards does not fail loudly. Mouth-down looks like the
+obvious choice — the cavity opens at the bed and prints as a plain vertical
+channel — but it puts the *blind* end at the top, where its ceiling is a
+horizontal overhang, and the slicer dutifully fills the whole cavity with
+support you can never get out. Sliced both ways, supports reach z 29.0 mouth
+down against z 21.6 mouth up, and only the second stops at the hooks.
 
 - **ASA** for the real set: it creeps less than PETG under the permanent
   tension in the hooks. PETG is fine for a fit test.
