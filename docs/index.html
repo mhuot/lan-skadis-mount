@@ -258,7 +258,8 @@
 
   <h2>Printing</h2>
   <p>Lay the bracket on a side face so the hook profile is drawn inside every layer instead of stacked across them. In that orientation the cavity and the screw slot need <strong>no support at all</strong> — they run along the build direction — and organic supports grow only under the two hooks.</p>
-  <p>Put the <strong>outboard edge on the bed</strong>, so the cavity opens downward and prints as a plain vertical channel rather than a blind pocket with an unsupported ceiling. That is <code>--rotate-x 90</code> for the left bracket and <code>--rotate-x -90</code> for the right: the hands are mirrored, so they do not share a rotation.</p>
+  <p>Put the <strong>inboard edge on the bed</strong>, so the cavity's blind end is at the bottom and its mouth opens at the top. That is <code>--rotate-x -90</code> for the left bracket and <code>--rotate-x 90</code> for the right: the hands are mirrored, so they do not share a rotation.</p>
+  <p>Backwards is the intuitive choice and it fails quietly. Mouth-down means the cavity opens at the bed and prints as a plain vertical channel &mdash; but it puts the <em>blind</em> end up top, where its ceiling is a horizontal overhang, and the slicer fills the entire cavity with support you can never get out again. Sliced both ways, supports reach z&nbsp;29.0 mouth-down against z&nbsp;21.6 mouth-up, and only the second stops at the hooks.</p>
   <div class="table-wrap">
   <table>
     <thead><tr><th>Setting</th><th>Value</th><th>Why</th></tr></thead>
