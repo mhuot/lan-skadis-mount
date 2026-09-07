@@ -11,7 +11,7 @@ desk.
 
 <p align="center">
   <img src="docs/images/nut_bracket_front.png" width="31%" alt="Front of the bracket: flat but for the screw slot">
-  <img src="docs/images/nut_bracket_edge.png" width="31%" alt="Outboard edge of the bracket, showing the cavity the nut slides into">
+  <img src="docs/images/nut_bracket_edge.png" width="31%" alt="Section along the cavity: the nut drops in from the top edge and slides inboard">
   <img src="docs/images/nut_bracket_section.png" width="31%" alt="Section through the bracket, showing the nut cavity behind a solid wall">
 </p>
 
