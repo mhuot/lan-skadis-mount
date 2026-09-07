@@ -8,17 +8,24 @@ An M4 square nut, MEASURED 7 x 7 x 3 mm (a DIN 557 pattern, not the thin
 DIN 562 at 2.2 that this was first built around -- the open channel hid the
 error because a pocket facing the board does not care how thick the nut is),
 lives in a cavity INSIDE the plate, closed on the board
-side by a 4 mm wall and open only at the plate's outboard edge, which is
-where it slides in. 12 mm of slide = the left-right adjustment, so the board
+side by a 4 mm wall and closed at both ends. It drops in through a short
+vertical entry from the plate's TOP EDGE at the outboard end of its travel,
+then slides inboard; to get out it must be back at that spot AND rise 20 mm,
+which gravity never does with the bracket hanging. Captured by geometry, no
+tooth, nothing to tune. The outboard end carries a 45 deg roof (a triangular
+CUT beyond the nut's stop, NOT a chamfer -- chamfering the concave end edges
+fills the corners and narrows the entry below the nut) so it prints with no
+support inside the cavity. 12 mm of slide = the left-right adjustment, so the board
 is positioned at assembly rather than at slicing. Tightening pulls the nut
 forward onto the wall and clamps the board between the screw head and a flat
 plate face.
 
-Two designs preceded it and were deleted, not kept as variants: printed pegs
-(worked, but zero adjustment, 3-5 mm out left to right) and an open channel
+Three designs preceded it and were deleted, not kept as variants: printed
+pegs (worked, but zero adjustment, 3-5 mm out left to right); an open channel
 milled in the face (adjustable, but the board covered the pocket, so the nut
-had to be posted through a board slot with the board already hanging). Do
-not reintroduce either; git history has both.
+had to be posted through a board slot with the board already hanging); and a
+cavity with a mouth in the outboard edge (captured, but the nut slid straight
+back out in the hand). Do not reintroduce any; git history has all three.
 
 ## Source of truth
 

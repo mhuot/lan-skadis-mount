@@ -29,9 +29,16 @@ plate:
 
 - The cavity is enclosed on the board side by **4 mm of solid wall**. The
   board lands on a flat face; nothing but the screw slot breaks it.
-- It breaks out of the plate's **outboard edge and nowhere else**, so the
-  nut slides in from the side with the bracket in your hand, before it ever
-  goes on the desk.
+- It is **closed at both ends**. The nut drops in through a short vertical
+  entry from the plate's **top edge**, at the outboard end of its travel,
+  with the bracket in your hand — then slides inboard. To get out again it
+  has to be back at that one position *and* rise 20 mm, which gravity never
+  does with the bracket hanging. Captured by geometry: nothing to tune,
+  nothing to wear.
+- The outboard end of the cavity carries a **45° roof** beyond the nut's
+  stop, so that end prints unsupported. Without it the slicer grows organic
+  support up inside the cavity to hold a 3.4 mm ceiling, and it can never be
+  got out.
 - It is **12 mm longer than the nut**, and that length is the left-right
   adjustment. Slide, then tighten.
 - It is **7.4 mm tall against a 7.0 mm nut**, well under the nut's 9.9 mm
@@ -111,17 +118,16 @@ drawn inside every layer instead of stacked across them. In that orientation
 **the cavity and the screw slot need no support at all** (they run along the
 build direction), and organic supports grow only under the two hooks.
 
-Put the **inboard edge on the bed**, so the cavity's blind end is at the
-bottom and its mouth opens at the top. That is `--rotate-x -90` for the
-**left** bracket and `--rotate-x 90` for the **right** — the two hands are
-mirrored, so they do not share a rotation.
+Put the **inboard edge on the bed**, so the cavity's roofed outboard end is
+uppermost. That is `--rotate-x -90` for the **left** bracket and
+`--rotate-x 90` for the **right** — the two hands are mirrored, so they do
+not share a rotation.
 
-Getting this backwards does not fail loudly. Mouth-down looks like the
-obvious choice — the cavity opens at the bed and prints as a plain vertical
-channel — but it puts the *blind* end at the top, where its ceiling is a
-horizontal overhang, and the slicer dutifully fills the whole cavity with
-support you can never get out. Sliced both ways, supports reach z 29.0 mouth
-down against z 21.6 mouth up, and only the second stops at the hooks.
+The other way up puts the cavity's flat inboard end on top, where it is a
+3.4 mm ceiling, and the slicer grows organic support up inside the cavity to
+hold it — support that sits exactly where the nut has to slide and can never
+be reached. Sliced both ways, supports reach z 29.0 wrong way up against
+z 21.6 right way up, and only the second stops at the hooks.
 
 - **ASA** for the real set: it creeps less than PETG under the permanent
   tension in the hooks. PETG is fine for a fit test.

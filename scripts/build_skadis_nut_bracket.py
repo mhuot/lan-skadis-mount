@@ -19,9 +19,13 @@ The joint this builds:
     nutChannelHeight tall against a 7.0 mm nut, well under its 9.9 mm
     diagonal, so the nut cannot rotate and the screw is tightened one-handed
     from the front.
-  * The cavity breaks out of the plate's OUTBOARD EDGE and nowhere else, so
-    the nut slides in from the side with the bracket in your hand, before it
-    ever goes on the desk.
+  * The cavity is closed at both ends. The nut drops in through a short
+    vertical entry from the plate's TOP EDGE at the outboard end of its
+    travel, with the bracket in your hand, and slides inboard. To get out
+    it has to be back at that one position and rise 20 mm, which gravity
+    never does with the bracket hanging: captured by geometry, with nothing
+    to tune and nothing to wear. (A mouth in the outboard edge came first
+    and let the nut slide straight back out in the hand.)
   * The cavity is mountTravel longer than the nut. That length IS the
     left-right adjustment: slide, then tighten.
   * The IKEA decorative M4 screw goes in from the front, through the board,
@@ -298,8 +302,12 @@ def _check_mount_fits():
             f"PLATE_INBOARD_EXTENSION (now {PLATE_INBOARD_EXTENSION} mm) or "
             f"cut MOUNT_TRAVEL (now {MOUNT_TRAVEL} mm)."
         )
-    if plate_height() < top_mount_z() + NUT_CHANNEL_HEIGHT / 2.0 + MOUNT_EDGE_MARGIN:
-        raise RuntimeError("top channel runs off the top of the plate")
+    entry_height = plate_height() - (top_mount_z() + NUT_CHANNEL_HEIGHT / 2.0)
+    if entry_height < 2.0:
+        raise RuntimeError(
+            f"only {entry_height:.1f} mm between the cavity and the top edge; "
+            "the drop-in entry needs somewhere to be"
+        )
     lowest = top_mount_z() - (mount_rows() - 1) * BOARD_PITCH
     if lowest - NUT_CHANNEL_HEIGHT / 2.0 < MOUNT_EDGE_MARGIN:
         raise RuntimeError("bottom channel runs off the bottom of the plate")
@@ -333,6 +341,7 @@ def _check_mount_fits():
         f"  plate {min(low, high):+.1f}..{max(low, high):+.1f} mm, "
         f"channel gaps {gaps[0]:.2f} / {gaps[1]:.2f} mm"
     )
+    print(f"  drop-in entry {entry_height:.1f} mm tall from the top edge")
     print(
         f"  cavity x {NUT_CAVITY_BACK:.1f}..{NUT_CAVITY_FRONT:.1f} mm behind a "
         f"{NUT_WALL_THICKNESS} mm wall, {NUT_THICKNESS} mm of thread engaged, "
@@ -433,6 +442,11 @@ def parameters():
         "topMountZ": (top_mount_z(), "mm", "top channel centre"),
         "mountOffsetY": (mount_offset(), "mm", "channel centre on the board's grid"),
         "slotOvershoot": (SLOT_OVERSHOOT, "mm", "cuts reach past the faces they cut"),
+        "nutRoofDepth": (
+            "nutCavityDepth / 2",
+            "mm",
+            "45 deg roof beyond the cavity's outboard end, so it prints unsupported",
+        ),
     }
     if not _is_coupon():
         table.update(_hook_parameters())
@@ -783,46 +797,41 @@ def _pattern_down(component, feature, name):
     patterns.add(pattern_input).name = name
 
 
-def _cavity_extent():
-    """(width, offset) expressions that run the cavity out the outboard edge.
+def entry_offset_expression():
+    """Y of the drop-in entry, as an expression: the outboard end of travel.
 
-    The cavity is loaded from the SIDE, not through the board: slide the nut
-    in from the plate's outboard edge before the bracket ever goes on the
-    desk. So it has to break out of that edge, and its far end stops where
-    the nut's travel stops. Inboard is +Y on the left bracket and -Y on the
-    right, and mountOffsetY carries its own sign, so the two hands need
-    mirrored expressions rather than one with an abs() in it.
+    The nut is only ever under the entry when it has been slid to the far
+    outboard limit of its adjustment, so in use -- nominal position, screw
+    in -- there is 6 mm of solid plate between it and the way out. Inboard is
+    +Y on the left bracket and -Y on the right, and mountOffsetY carries its
+    own sign, so the two hands need mirrored expressions.
     """
     if BUILD_VARIANT == "right":
-        return (
-            "-mountOffsetY + nutChannelLength / 2 + bracketWidth / 2 + slotOvershoot",
-            "(mountOffsetY - nutChannelLength / 2 + bracketWidth / 2"
-            " + slotOvershoot) / 2",
-        )
-    return (
-        "mountOffsetY + nutChannelLength / 2 + bracketWidth / 2 + slotOvershoot",
-        "(mountOffsetY + nutChannelLength / 2 - bracketWidth / 2 - slotOvershoot) / 2",
-    )
+        return "mountOffsetY + mountTravel / 2"
+    return "mountOffsetY - mountTravel / 2"
 
 
 def _build_mounts(component, plane):
-    """The captured nut cavity and the screw hole that reaches it.
+    """The captured nut cavity, its drop-in entry, and the screw hole.
 
-    Two cuts, and the order they appear in the part front to back is:
+    Three cuts. Front to back the part reads:
 
       plateThickness .. -nutWallThickness   solid wall the board clamps to,
                                             pierced only by the screw slot
-      the cavity, nutCavityDepth deep       the nut, enclosed on the board
-                                            side, open only at the outboard
-                                            edge it slides in from
+      the cavity, nutCavityDepth deep       the nut, enclosed on every side
       the rest of the plate                 pierced by the same screw slot so
                                             the tip has somewhere to go
 
+    The cavity is closed at BOTH ends. The nut gets in through a vertical
+    entry from the plate's top edge, at the outboard end of the travel: drop
+    it in, it lands in the cavity, slide it inboard. To get out again it has
+    to be at that one position and rise 20 mm, which gravity never does with
+    the bracket hanging. That is the whole retention scheme -- no tooth, no
+    spring, nothing to tune, nothing to wear. It replaced a mouth in the
+    outboard edge, which let the nut slide straight back out in the hand.
+
     Tightening pulls the nut FORWARD onto the wall and clamps the board
-    between the screw head and a flat plate face. The open channel this
-    replaces had no wall: the board covered the pocket, so the nut had to be
-    posted through a board slot with the board already hanging, and the joint
-    clamped board-to-nut rather than board-to-plate.
+    between the screw head and a flat plate face.
     """
     mount_z = top_mount_z()
     screw = _cut_rectangle(
@@ -845,7 +854,6 @@ def _build_mounts(component, plane):
         "mountOffsetY",
     )
     _pattern_down(component, screw, "Screw hole rows")
-    width_expression, offset_expression = _cavity_extent()
     cavity = _cut_rectangle(
         component,
         plane,
@@ -862,10 +870,136 @@ def _build_mounts(component, plane):
             "nutCavityDepth",
             "nutChannelHeight",
         ),
-        width_expression,
-        offset_expression,
+        "nutChannelLength",
+        "mountOffsetY",
     )
     _pattern_down(component, cavity, "Nut cavity rows")
+    # The entry shares the cavity's cross-section -- same depth, and the
+    # nut's 7 mm across flats plus the same clearance for its width -- and
+    # starts a little inside the cavity so the two voids are one void.
+    cavity_top = mount_z + NUT_CHANNEL_HEIGHT / 2.0
+    entry = _cut_rectangle(
+        component,
+        plane,
+        "Nut entry",
+        (
+            NUT_CAVITY_BACK,
+            NUT_CAVITY_FRONT,
+            cavity_top - SLOT_OVERSHOOT,
+            plate_height() + SLOT_OVERSHOOT,
+        ),
+        (
+            "plateThickness - nutWallThickness",
+            "topMountZ + nutChannelHeight / 2 - slotOvershoot",
+            "nutCavityDepth",
+            "plateHeight - topMountZ - nutChannelHeight / 2 + 2 * slotOvershoot",
+        ),
+        "nutChannelHeight",
+        entry_offset_expression(),
+    )
+    _pattern_down(component, entry, "Nut entry rows")
+
+
+# pylint: disable-next=too-many-locals
+def _roof_cavity_end(component, plane):
+    """Cut a 45 degree roof beyond the cavity's outboard end.
+
+    The bracket prints on its side with that end uppermost, so the cavity's
+    end face is a flat 3.4 mm ceiling, and the entry shares it. Small enough
+    to bridge -- but the slicer does not see a bridge, it sees an overhang,
+    and grows organic support up inside the cavity to hold it: 348 moves of
+    it, and 258 even with supports restricted to the build plate, because
+    the tree found its way out through the screw slot. That support sits
+    where the nut has to slide and can never be reached.
+
+    So the flat end is replaced by a V that continues past it: a triangle in
+    the XY plane, base across the cavity's full depth at the old end, apex
+    nutRoofDepth further out, extruded through the cavity and entry. Each
+    layer's void is narrower than the one below by exactly its height, which
+    is a 45 degree overhang, which needs nothing under it. The nut's flat
+    face stops exactly where it did; only the void beyond it changes shape.
+
+    It has to be a cut, not a chamfer: chamfering the end face's concave
+    edges FILLS the corners instead, narrowing the entry below the nut.
+    """
+    inboard = 1.0 if mount_offset() >= 0 else -1.0
+    end_y = mount_offset() - inboard * NUT_CHANNEL_LENGTH / 2.0
+    apex_y = end_y - inboard * NUT_CAVITY_DEPTH / 2.0
+    mid_x = (NUT_CAVITY_BACK + NUT_CAVITY_FRONT) / 2.0
+    # Distance dimensions carry no sign, so the expression for the end's Y
+    # has to come out positive whichever side of the origin it is on.
+    end_expression = (
+        "mountOffsetY - nutChannelLength / 2"
+        if inboard > 0
+        else "mountOffsetY + nutChannelLength / 2"
+    )
+    if end_y < 0:
+        end_expression = f"-({end_expression})"
+
+    sketch = component.sketches.add(plane)
+    sketch.name = "Cavity roof"
+    lines = sketch.sketchCurves.sketchLines
+    point = adsk.core.Point3D.create
+    base = lines.addByTwoPoints(
+        point(NUT_CAVITY_BACK * MM, end_y * MM, 0),
+        point(NUT_CAVITY_FRONT * MM, end_y * MM, 0),
+    )
+    rise = lines.addByTwoPoints(base.endSketchPoint, point(mid_x * MM, apex_y * MM, 0))
+    lines.addByTwoPoints(rise.endSketchPoint, base.startSketchPoint)
+    sketch.geometricConstraints.addHorizontal(base)
+    horizontal = adsk.fusion.DimensionOrientations.HorizontalDimensionOrientation
+    vertical = adsk.fusion.DimensionOrientations.VerticalDimensionOrientation
+    dimensions = sketch.sketchDimensions
+    for point_a, point_b, orientation, expression, text in (
+        (
+            sketch.originPoint,
+            base.startSketchPoint,
+            horizontal,
+            "plateThickness - nutWallThickness - nutCavityDepth",
+            (NUT_CAVITY_BACK / 2, end_y - 3),
+        ),
+        (
+            sketch.originPoint,
+            base.startSketchPoint,
+            vertical,
+            end_expression,
+            (-4.0, end_y / 2),
+        ),
+        (
+            sketch.originPoint,
+            base.endSketchPoint,
+            horizontal,
+            "plateThickness - nutWallThickness",
+            (NUT_CAVITY_FRONT / 2, end_y + 3),
+        ),
+        (
+            sketch.originPoint,
+            rise.endSketchPoint,
+            horizontal,
+            "plateThickness - nutWallThickness - nutCavityDepth / 2",
+            (mid_x / 2, apex_y - 3),
+        ),
+        (
+            base.startSketchPoint,
+            rise.endSketchPoint,
+            vertical,
+            "nutRoofDepth",
+            (NUT_CAVITY_BACK - 3, (end_y + apex_y) / 2),
+        ),
+    ):
+        dimension = dimensions.addDistanceDimension(
+            point_a, point_b, orientation, point(text[0] * MM, text[1] * MM, 0)
+        )
+        dimension.parameter.expression = expression
+    roof = _extrude(
+        component,
+        sketch,
+        "plateHeight - topMountZ + nutChannelHeight / 2 + 2 * slotOvershoot",
+        adsk.fusion.FeatureOperations.CutFeatureOperation,
+        "Cavity roof",
+        offset_expression="(topMountZ - nutChannelHeight / 2 + plateHeight) / 2",
+    )
+    _pattern_down(component, roof, "Cavity roof rows")
 
 
 def _probe(body, x_mm, y_mm, z_mm):
@@ -1015,20 +1149,57 @@ def _verify(body):  # pylint: disable=too-many-locals
     outboard_edge = plate_span()[0]
     inboard = 1.0 if offset >= 0 else -1.0
     above_channel_z = top_mount_z() + NUT_CHANNEL_HEIGHT / 2.0 + 2.0
-    checks = [("plate interior", PLATE_THICKNESS / 2.0, 0.0, above_channel_z, inside)]
+    # Behind the cavity, above the screw slot: the one column of plate that
+    # no cut passes through.
+    checks = [("plate interior", NUT_CAVITY_BACK / 2.0, 0.0, above_channel_z, inside)]
     if not _is_coupon():
         lip_mid_x = -(HOOK_THROAT + HOOK_LIP_THICKNESS / 2.0)
         for row in range(HOOK_ROWS):
             neck_top = TOP_HOOK_NECK_TOP - row * SLOT_PITCH_VERTICAL
             lip_z = neck_top - HOOK_NECK_HEIGHT - HOOK_LIP_DROP / 2.0
             checks.append((f"hook row {row} lip", lip_mid_x, 0.0, lip_z, inside))
+    entry_y = offset - inboard * MOUNT_TRAVEL / 2.0
     for row in range(mount_rows()):
         mount_z = top_mount_z() - row * BOARD_PITCH
         beyond = offset + inboard * (NUT_CHANNEL_LENGTH / 2.0 + 1.5)
+        # Past the roof's apex, not just past the end: the V continues the
+        # void nutCavityDepth / 2 further out along the midline.
+        before = offset - inboard * (
+            NUT_CHANNEL_LENGTH / 2.0 + NUT_CAVITY_DEPTH / 2.0 + 1.0
+        )
         checks += [
-            # The cavity is open where the nut goes in and closed where the
-            # board lands: that pair of probes is the whole design change.
+            # Closed on the board side, closed at both ends, open only from
+            # the top edge at the outboard end of travel: those four probes
+            # are the whole retention scheme.
             (f"row {row} cavity open", cavity_mid_x, offset, mount_z, outside),
+            (
+                f"row {row} cavity closed outboard",
+                cavity_mid_x,
+                before,
+                mount_z,
+                inside,
+            ),
+            (
+                f"row {row} entry open at top edge",
+                cavity_mid_x,
+                entry_y,
+                plate_height() - 1.0,
+                outside,
+            ),
+            (
+                f"row {row} entry meets cavity",
+                cavity_mid_x,
+                entry_y,
+                mount_z + NUT_CHANNEL_HEIGHT / 2.0 + 1.0,
+                outside,
+            ),
+            (
+                f"row {row} top edge solid off entry",
+                cavity_mid_x,
+                offset,
+                plate_height() - 1.0,
+                inside,
+            ),
             # Off the screw's centreline: the wall is pierced by the screw
             # hole, so probing dead centre only ever finds the hole.
             (
@@ -1053,12 +1224,28 @@ def _verify(body):  # pylint: disable=too-many-locals
                 outside,
             ),
             (f"row {row} screw through back", 0.5, offset, mount_z, outside),
+            # The roof: void along the midline just past the old end, solid
+            # near the walls where the V has already closed in.
             (
-                f"row {row} cavity reaches the edge",
+                f"row {row} roof open on the midline",
+                (NUT_CAVITY_BACK + NUT_CAVITY_FRONT) / 2.0,
+                offset - inboard * (NUT_CHANNEL_LENGTH / 2.0 + 0.8),
+                mount_z,
+                outside,
+            ),
+            (
+                f"row {row} roof closed by the wall",
+                NUT_CAVITY_BACK + 0.25,
+                offset - inboard * (NUT_CHANNEL_LENGTH / 2.0 + 0.8),
+                mount_z,
+                inside,
+            ),
+            (
+                f"row {row} outboard edge solid",
                 cavity_mid_x,
                 outboard_edge + inboard * 0.5,
                 mount_z,
-                outside,
+                inside,
             ),
             (
                 f"row {row} cavity ends inboard",
@@ -1127,6 +1314,9 @@ def run(_context: str):
     if not _is_coupon():
         _build_hooks(component, plane)
     _build_mounts(component, plane)
+    if component.bRepBodies.count != 1:
+        raise RuntimeError(f"expected one body, got {component.bRepBodies.count}")
+    _roof_cavity_end(component, component.xYConstructionPlane)
     if component.bRepBodies.count != 1:
         raise RuntimeError(f"expected one body, got {component.bRepBodies.count}")
     body = component.bRepBodies.item(0)

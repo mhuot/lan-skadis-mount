@@ -239,7 +239,7 @@
     <a class="btn btn-ghost" href="#joint">How the joint works</a>
   </div>
   <model-viewer
-    src="models/skadis-mount.glb?v=33834b29"
+    src="models/skadis-mount.glb?v=c26d11df"
     alt="3D model of a SKÅDIS pegboard hanging on four red printed brackets hooked into two steel uprights"
     camera-controls auto-rotate auto-rotate-delay="1200" rotation-per-second="16deg"
     shadow-intensity="0.9" exposure="1.05" camera-orbit="68deg 80deg 82%"
@@ -294,7 +294,7 @@
     <ol class="legend">
       <li><b>Upright face metal.</b> The plate's back bears flat on it; the hooks wrap through the punched slots.</li>
       <li><b>The plate, 11.0 mm.</b> Not chosen — derived from the screw length.</li>
-      <li><b>Nut cavity, 7.4 × 3.4 mm.</b> Open at one edge only. 7.4 is under the nut's 9.9 mm diagonal, so it cannot turn.</li>
+      <li><b>Nut cavity, 7.4 × 3.4 mm.</b> Closed at both ends; the nut drops in from the top edge at the outboard end of its travel. 7.4 is under the nut's 9.9 mm diagonal, so it cannot turn.</li>
       <li><b>The nut.</b> Slides the length of the cavity; that travel is the adjustment.</li>
       <li><b>The 4 mm wall.</b> Tightening pulls the nut forward onto this, which makes it an ordinary clamped bolt.</li>
       <li><b>Screw slot, 16.8 mm long.</b> One cut through the full thickness, so the tip passes behind the nut.</li>
@@ -309,13 +309,13 @@
   <span class="eyebrow">The part</span>
   <h2>What you print</h2>
   <div class="grid-4">
-    <figure class="shot"><img src="images/nut_bracket_front.png?v=2c0b398c" alt="Front of the bracket: a flat face broken only by a horizontal screw slot" loading="lazy" data-zoom><figcaption><b>Front</b>Flat where the board lands.</figcaption></figure>
-    <figure class="shot"><img src="images/nut_bracket_edge.png?v=d39a0fbc" alt="The outboard edge of the bracket, showing the mouth of the nut cavity" loading="lazy" data-zoom><figcaption><b>Outboard edge</b>The mouth the nut goes in.</figcaption></figure>
-    <figure class="shot"><img src="images/nut_bracket_section.png?v=556587d6" alt="Section through the bracket showing the nut cavity enclosed behind a solid wall" loading="lazy" data-zoom><figcaption><b>Section</b>Cavity behind the wall.</figcaption></figure>
-    <figure class="shot"><img src="images/nut_bracket_hooks.png?v=a5a170df" alt="Back of the bracket: two blade hooks that enter the upright's slots" loading="lazy" data-zoom><figcaption><b>Back</b>Two hooks take the load.</figcaption></figure>
+    <figure class="shot"><img src="images/nut_bracket_front.png?v=501ef990" alt="Front of the bracket: a flat face broken only by a horizontal screw slot" loading="lazy" data-zoom><figcaption><b>Front</b>Flat where the board lands.</figcaption></figure>
+    <figure class="shot"><img src="images/nut_bracket_edge.png?v=7d2ea43c" alt="The top edge of the bracket, showing the entry slot the nut drops through" loading="lazy" data-zoom><figcaption><b>Top edge</b>The entry the nut drops through.</figcaption></figure>
+    <figure class="shot"><img src="images/nut_bracket_section.png?v=00ca1341" alt="Section through the bracket showing the nut cavity enclosed behind a solid wall" loading="lazy" data-zoom><figcaption><b>Section</b>Cavity behind the wall.</figcaption></figure>
+    <figure class="shot"><img src="images/nut_bracket_hooks.png?v=226c0417" alt="Back of the bracket: two blade hooks that enter the upright's slots" loading="lazy" data-zoom><figcaption><b>Back</b>Two hooks take the load.</figcaption></figure>
   </div>
   <model-viewer style="margin-top:1.1rem"
-    src="models/nut-bracket.glb?v=5070f14c"
+    src="models/nut-bracket.glb?v=81165625"
     alt="3D model of a single printed bracket: a plate with two hooks on the back and a nut cavity inside"
     camera-controls auto-rotate auto-rotate-delay="1200" rotation-per-second="20deg"
     shadow-intensity="0.75" exposure="1.05" camera-orbit="55deg 72deg 105%"
@@ -370,7 +370,7 @@
   <span class="eyebrow">Printing</span>
   <h2>One orientation matters more than the rest</h2>
   <p class="big">Lay the bracket on a side face so the hook profile is drawn inside every layer instead of stacked across them. The cavity and the screw slot then need no support at all — they run along the build direction — and supports grow only under the two hooks.</p>
-  <div class="callout-box"><p><b>Put the inboard edge on the bed.</b> <code>--rotate-x -90</code> for the left bracket, <code>--rotate-x 90</code> for the right. Mouth-down is the intuitive choice and it fails quietly: it puts the cavity's <em>blind</em> end up top, where its ceiling is a horizontal overhang, and the slicer fills the whole cavity with support you can never get out. Sliced both ways, supports reach z&nbsp;29.0 mouth-down against z&nbsp;21.6 mouth-up.</p></div>
+  <div class="callout-box"><p><b>Put the inboard edge on the bed.</b> <code>--rotate-x -90</code> for the left bracket, <code>--rotate-x 90</code> for the right. That puts the cavity's outboard end uppermost, and that end carries a 45° roof beyond the nut's stop so it prints with nothing under it. The other way up leaves a flat 3.4&nbsp;mm ceiling on top, and the slicer grows organic support up inside the cavity to hold it &mdash; where the nut has to slide, and where you can never reach. Sliced both ways: supports reach z&nbsp;29.0 wrong way up against z&nbsp;21.6 right way up.</p></div>
   <div class="grid-3">
     <div class="card"><span class="num">PETG</span><p>Sufficient, and arguably better than ASA here: the 2.4 mm hook tab is tougher in PETG, and nothing warps. Stresses run 2–5% of yield.</p></div>
     <div class="card"><span class="num">4 walls · 40%</span><p>Stock “structural” profiles ship thinner than this, and the hooks carry the whole board.</p></div>
