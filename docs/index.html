@@ -6,7 +6,7 @@
 <title>LAN SKÅDIS Mount</title>
 <meta name="description" content="3D printed brackets that hang an IKEA SKÅDIS pegboard on the slotted uprights of an Ergotron LAN Organizer 3000. No drilling, no wall. Free files, MIT licensed.">
 <meta property="og:title" content="LAN SKÅDIS Mount">
-<meta property="og:description" content="Hang a SKÅDIS pegboard on an old Ergotron desk frame. Square nut in a sliding channel, so the board is aligned at assembly instead of at slicing.">
+<meta property="og:description" content="Hang a SKÅDIS pegboard on an old Ergotron desk frame. A captured square nut slides inside the bracket, so the board is aligned at assembly instead of at slicing.">
 <meta property="og:type" content="website">
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <style>
@@ -190,22 +190,31 @@
   <p>So the board needs to hang on the slots that are already there. The hook that grips the upright is the one already fit-verified on the real desk by the spool shelf's gauge prints, which meant the only genuinely new problem was how the board attaches to the bracket.</p>
 
   <h2>The joint</h2>
-  <p>A <strong>DIN 562 M4 square nut</strong> is 2.2&nbsp;mm thick and 7&nbsp;mm across the flats, and a SKÅDIS slot is 5&nbsp;×&nbsp;15&nbsp;mm. So the nut feeds edgewise through a slot, turns flat behind the board, and drops into a horizontal channel milled into the face of the bracket. IKEA's own decorative M4 screw goes in from the front, through the board, into that nut.</p>
+  <p>A <strong>DIN 562 M4 square nut</strong> — 2.2&nbsp;mm thick, 7&nbsp;mm across the flats — lives in a cavity <em>inside</em> the bracket. It slides in from the plate's outboard edge while the bracket is still in your hand, and once the bracket is on the desk there is no way for it to fall out. IKEA's own decorative M4 screw goes in from the front, through the board, through a 3&nbsp;mm wall, and into that nut.</p>
   <div class="shots">
     <figure>
-      <img src="images/nut_bracket_front.png" alt="Front of the bracket: a horizontal channel with a screw relief slot through the middle of it" loading="lazy" data-zoom>
-      <figcaption>Front. The channel the nut slides in, with the screw relief running straight through to the back.</figcaption>
+      <img src="images/nut_bracket_front.png" alt="Front of the bracket: a flat face broken only by a horizontal screw slot" loading="lazy" data-zoom>
+      <figcaption>Front. Flat where the board lands — only the screw slot breaks it, and the slot's length is the adjustment.</figcaption>
+    </figure>
+    <figure>
+      <img src="images/nut_bracket_section.png" alt="Section through the bracket showing the nut cavity enclosed behind a solid wall" loading="lazy" data-zoom>
+      <figcaption>Cut through the screw axis. The cavity sits behind a solid wall; the hooks are on the left.</figcaption>
+    </figure>
+    <figure>
+      <img src="images/nut_bracket_edge.png" alt="The outboard edge of the bracket, showing the mouth of the nut cavity" loading="lazy" data-zoom>
+      <figcaption>The outboard edge. That mouth is where the nut goes in.</figcaption>
     </figure>
     <figure>
       <img src="images/nut_bracket_hooks.png" alt="Back of the bracket: two blade hooks that enter the upright's slots" loading="lazy" data-zoom>
       <figcaption>Back. Two blade hooks drop into the upright's punched slots and take the whole load.</figcaption>
     </figure>
   </div>
-  <p>Three things make that channel work rather than merely fit:</p>
+  <p>Four things make that cavity work rather than merely fit:</p>
   <ul>
+    <li>It is <strong>closed on the board side</strong> by 3&nbsp;mm of solid wall, so the board clamps flat against the plate and the nut is not something the board has to sit on.</li>
     <li>It is <strong>12&nbsp;mm longer than the nut</strong>, and that length is the left-right adjustment. Slide the board where you want it, then tighten.</li>
     <li>It is <strong>7.4&nbsp;mm tall against a 7.0&nbsp;mm nut</strong> — comfortably under the nut's 9.9&nbsp;mm diagonal — so the nut cannot rotate and you can tighten the screw one-handed from the front.</li>
-    <li>The nut stands <strong>0.2&nbsp;mm proud</strong> of its pocket, so tightening clamps it against the channel floor. Flush or recessed and it slides straight back out of the adjustment you just made.</li>
+    <li>Tightening pulls the nut <strong>forward onto that wall</strong>, which turns the joint into an ordinary clamped bolt: board between the screw head and the plate.</li>
   </ul>
 
   <model-viewer
@@ -226,8 +235,8 @@
   <p>Every dimension in this project that was assumed turned out to be wrong, and every one that was measured has held. Two of the measured ones rewrote the part.</p>
   <p><strong>The board is 6.0&nbsp;mm, not 4.6.</strong> Both community SKÅDIS libraries quote 4.6&nbsp;mm, and an earlier version of this bracket believed them — it built its pegs as <code>boardThickness + 0.2</code>, so against a real board they finished <em>1.4&nbsp;mm short of reaching through it</em> and the retaining prong clamped the board instead of standing clear in front of it.</p>
   <p><strong>The decorative screw is 15&nbsp;mm.</strong> Through a 6&nbsp;mm board that leaves 9&nbsp;mm of screw behind the board with nowhere to go. The old 5.4&nbsp;mm plate would have let the tip stand proud of its own back face and jam against the upright's steel. So the plate thickness is not a choice — it is derived:</p>
-  <pre><code>plateThickness = screwLength - boardThickness - nutProud + screwTipClearance
-               = 15.0 - 6.0 - 0.2 + 2.2
+  <pre><code>plateThickness = screwLength - boardThickness + screwTipClearance
+               = 15.0 - 6.0 + 2.0
                = 11.0 mm</code></pre>
   <p>Change the screw and the plate follows. The build refuses outright if the tip would come within 0.5&nbsp;mm of the back face.</p>
   <p>There is a happy side effect. Bending stiffness goes as thickness cubed, so 5.4&nbsp;→&nbsp;11.0&nbsp;mm is <strong>8.5× stiffer</strong> out of plane. At the worst nut position a bracket's share of a 15&nbsp;kg loaded board comes to 0.118&nbsp;MPa against ASA's ~45&nbsp;MPa — a 380× margin — which is why the plate carries no stiffening rib. It would be holding up nothing.</p>
@@ -248,7 +257,8 @@
   <p>The build script prints that list on every run, so it cannot be lost in a README nobody rereads. The left and right brackets are mirrored, each putting its channel 7.52&nbsp;mm toward the middle of the desk — which is where the board's nearest slot column falls at the measured 735.04&nbsp;mm upright spacing.</p>
 
   <h2>Printing</h2>
-  <p>Lay the bracket on a side face, <code>--rotate-x 90</code>, so the hook profile is drawn inside every layer instead of stacked across them. In that orientation the channel and the screw relief need <strong>no support at all</strong> — they run along the build direction — and organic supports grow only under the two hooks, from the bed up to about 23&nbsp;mm.</p>
+  <p>Lay the bracket on a side face so the hook profile is drawn inside every layer instead of stacked across them. In that orientation the cavity and the screw slot need <strong>no support at all</strong> — they run along the build direction — and organic supports grow only under the two hooks.</p>
+  <p>Put the <strong>outboard edge on the bed</strong>, so the cavity opens downward and prints as a plain vertical channel rather than a blind pocket with an unsupported ceiling. That is <code>--rotate-x 90</code> for the left bracket and <code>--rotate-x -90</code> for the right: the hands are mirrored, so they do not share a rotation.</p>
   <div class="table-wrap">
   <table>
     <thead><tr><th>Setting</th><th>Value</th><th>Why</th></tr></thead>
@@ -264,15 +274,16 @@
   <p>One thing to watch: the supports touch the <em>side face of the hook tabs</em>, which is the face that enters the slot. Put a caliper on a tab after cleanup — nominal 2.4&nbsp;mm, and it has to stay under about 2.6&nbsp;mm to enter a 3.2&nbsp;mm slot.</p>
 
   <h2>What it replaced <span class="pill">history</span></h2>
-  <p>The first design hung the board on printed pegs: no bolts, no nuts, lower the board on and lift it off. It worked — a board hung on four of them with both ends engaged — and it is still in the repo as <code>build_skadis_bracket.py</code>.</p>
-  <p>It was replaced because it has no adjustment anywhere. Four rigid posts have to enter four slots at once, so every error in the upright measurement, in print shrinkage, and in the board's own tolerance lands on whoever is holding the board. It came out 3–5&nbsp;mm off left to right, and there was nothing to turn. A nut in a channel is a worse-looking joint and a far better one.</p>
+  <p>The first design hung the board on printed pegs: no bolts, no nuts, lower the board on and lift it off. It worked — a board hung on four of them with both ends engaged — and it was still replaced, because it has no adjustment anywhere. Four rigid posts have to enter four slots at once, so every error in the upright measurement, in print shrinkage, and in the board's own tolerance lands on whoever is holding the board. It came out 3–5&nbsp;mm off left to right, and there was nothing to turn.</p>
+  <p>The second was this same channel, but milled open into the face of the plate. That fixed the adjustment and introduced three smaller problems: the board covered the pocket, so the nut had to be posted through a board slot with the board already hanging; the joint clamped board-to-nut rather than board-to-plate; and the board rested on four nuts instead of flat on four plates. Burying the cavity fixes all three at the cost of one 3&nbsp;mm wall.</p>
+  <p>Both are gone from the working tree rather than kept as variants. Git history has them.</p>
 
   <h2>Get the files</h2>
   <p>STL, STEP and F3D for every part, plus the Fusion 360 scripts that generate them. Every user parameter drives geometry, with lengths in millimetres, angles in degrees and counts unitless — the build fails if that stops being true.</p>
   <p><a class="cta" href="https://github.com/mhuot/lan-skadis-mount">Repository on GitHub</a></p>
 
   <h2>Attribution</h2>
-  <p>The idea of hanging a SKÅDIS on printed pegs rather than bolting through it comes from <a href="https://www.printables.com/model/137113-skadis-to-kallax-mount-adapter">Skadis to Kallax mount adapter</a> by <strong>WegBier</strong>, licensed CC BY-NC-SA. That licence is incompatible with this repository's MIT licence, so none of that model's geometry is reproduced here — and the current design does not use a peg at all.</p>
+  <p>This project started from <a href="https://www.printables.com/model/137113-skadis-to-kallax-mount-adapter">Skadis to Kallax mount adapter</a> by <strong>WegBier</strong>, licensed CC BY-NC-SA, which is where the idea of mounting to SKÅDIS with a printed part rather than bolting through it came from. That licence is incompatible with this repository's MIT licence, so none of that model's geometry has ever been reproduced here, and the current design shares no feature with it.</p>
   <p>SKÅDIS interface dimensions are measurements of IKEA's product rather than anyone's authorship, cross-checked against <a href="https://github.com/franpoli/OpenSCADutil">franpoli/OpenSCADutil</a> and <a href="https://github.com/TassSinclair/skadis">TassSinclair/skadis</a>, then re-measured on the board itself.</p>
 </main>
 <footer>

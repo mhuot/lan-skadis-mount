@@ -1,27 +1,39 @@
-"""Fusion 360 script: SKADIS nut-channel bracket for Ergotron DuraFrame.
+"""Fusion 360 script: SKADIS captured-nut bracket for Ergotron DuraFrame.
 
-Run inside Fusion via scripts/run_in_fusion.py. Same proven hook stack as
-build_skadis_bracket.py, but the board is bolted on instead of hung on pegs.
+Run inside Fusion via scripts/run_in_fusion.py. Carries the hook stack that
+the spool shelf's gauge prints fit-verified on the real desk, and bolts the
+board on with a captured M4 square nut.
 
-Why this exists. The peg bracket works, and its photographs prove it, but it
-has no adjustment anywhere: four rigid posts have to enter four slots at
-once, so every error in the upright measurement, in print shrinkage, and in
-the board's own tolerance lands on the person holding the board. Measured
-3-5 mm out left to right, 2026-09-06, and there is nothing to turn.
+Why the pegs went. An earlier bracket hung the board on printed pegs. It
+worked, and its photographs prove it, but it had no adjustment anywhere:
+four rigid posts have to enter four slots at once, so every error in the
+upright measurement, in print shrinkage, and in the board's own tolerance
+landed on the person holding the board. Measured 3-5 mm out left to right,
+2026-09-06, with nothing to turn. It is deleted rather than kept as a
+variant; git history has it if it is ever wanted back.
 
-The joint this builds instead:
+The joint this builds:
 
-  * A DIN 562 M4 square nut feeds edgewise through a SKADIS slot (2.2 mm
-    thick passes the 5 mm slot), turns flat behind the board, and drops into
-    a horizontal channel cut in this plate's face. The channel is 7.4 mm
-    tall against a 7.0 mm nut, so the nut cannot rotate and can be tightened
-    one-handed from the front.
-  * The channel is mountTravel longer than the nut. That length IS the
+  * A DIN 562 M4 square nut lives in a cavity INSIDE the plate, enclosed on
+    the board side by nutWallThickness of solid material. The cavity is
+    nutChannelHeight tall against a 7.0 mm nut, well under its 9.9 mm
+    diagonal, so the nut cannot rotate and the screw is tightened one-handed
+    from the front.
+  * The cavity breaks out of the plate's OUTBOARD EDGE and nowhere else, so
+    the nut slides in from the side with the bracket in your hand, before it
+    ever goes on the desk. VERIFIED 2026-09-06: the nut fits the cavity.
+  * The cavity is mountTravel longer than the nut. That length IS the
     left-right adjustment: slide, then tighten.
-  * The IKEA decorative M4 screw goes in from the front, through the board
-    slot, into the nut. The nut stands nutProud of the plate face so
-    tightening clamps it against the channel floor rather than leaving it
-    free to slide.
+  * The IKEA decorative M4 screw goes in from the front, through the board,
+    through the wall, into the nut, and its tip passes behind the nut in the
+    same slot. Tightening pulls the nut FORWARD onto the wall and clamps the
+    board between the screw head and a flat plate face.
+
+That last point is why this replaced an open channel milled in the face.
+With the pocket open to the board, the board covered the nut: the nut had to
+be posted through a board slot with the board already hanging, the joint
+clamped board-to-nut instead of board-to-plate, and the board rested on the
+nuts rather than flat on the plate.
 
 Why the plate is 11 mm and not the peg bracket's 5.4 mm: the screw is 15 mm
 long and the board is 6.0 mm thick (MEASURED 2026-09-06 -- the peg bracket
@@ -34,12 +46,13 @@ answers the question the sketch asked -- whether the inboard extension needs
 a support rib. Bending stiffness goes as thickness cubed, so 5.4 -> 11.0 is
 already 8.5x stiffer out of plane; a rib on top of that is carrying nothing.
 
-Attribution: the idea of hanging SKADIS on printed pegs rather than bolting
-through it comes from "Skadis to Kallax mount adapter" by WegBier
-(https://www.printables.com/model/137113-skadis-to-kallax-mount-adapter),
-licensed CC BY-NC-SA, incompatible with this repository's MIT licence, so
-none of that model's geometry is reproduced here. This part does not use a
-peg at all. SKADIS interface dimensions are measurements of IKEA's product,
+Attribution: this project started from "Skadis to Kallax mount adapter" by
+WegBier (https://www.printables.com/model/137113-skadis-to-kallax-mount-adapter),
+licensed CC BY-NC-SA, which is where the idea of mounting to SKADIS with a
+printed part rather than bolting through it came from. That licence is
+incompatible with this repository's MIT licence, so none of that model's
+geometry has ever been reproduced here, and this part shares no feature with
+it. SKADIS interface dimensions are measurements of IKEA's product,
 cross-checked against https://github.com/franpoli/OpenSCADutil and
 https://github.com/TassSinclair/skadis, and then re-measured on the board.
 
@@ -105,23 +118,27 @@ assert HOOK_NECK_HEIGHT + HOOK_LIP_DROP < SLOT_HEIGHT - 1.0, "hook will not ente
 NUT_ACROSS_FLATS = 7.0
 NUT_THICKNESS = 2.2
 NUT_CHANNEL_CLEARANCE = 0.4  # across flats and along the channel
-# The nut stands this far out of its pocket so the screw clamps it down onto
-# the channel floor. Flush or recessed and the nut is free to slide along the
-# channel after tightening, which throws away the adjustment you just made.
-NUT_PROUD = 0.2
+NUT_CAVITY_CLEARANCE = 0.3  # across the nut's thickness
+# The wall left in FRONT of the nut. This is the whole point of a captured
+# cavity: the nut is enclosed, the screw pulls it forward against this wall,
+# and the board is clamped between the screw head and a flat plate face. The
+# earlier open channel had no wall at all -- the nut sat in a pocket the
+# board covered, so the board had to be held off the plate by the nut, and
+# the nut had to be fed through a board slot with the board already up.
+NUT_WALL_THICKNESS = 3.0
 SCREW_LENGTH = 15.0  # MEASURED: IKEA SKADIS decorative M4
 SCREW_DIAMETER = 4.0
 SCREW_CLEARANCE = 0.8
-SCREW_TIP_CLEARANCE = 2.2  # tip stops this far short of the plate's back face
-assert NUT_THICKNESS < BOARD_SLOT_WIDTH, "nut will not feed through a board slot"
-assert NUT_ACROSS_FLATS < BOARD_SLOT_HEIGHT, "nut will not feed through a board slot"
+SCREW_TIP_CLEARANCE = 2.0  # tip stops this far short of the plate's back face
 
 # --- Plate and mounts ------------------------------------------------------
 BRACKET_WIDTH = 24.0  # still fits the 25.4 gap at the module centre
 # DERIVED, not chosen: deep enough that a SCREW_LENGTH screw through a
 # BOARD_THICKNESS board stops SCREW_TIP_CLEARANCE short of the back face.
-PLATE_THICKNESS = SCREW_LENGTH - BOARD_THICKNESS - NUT_PROUD + SCREW_TIP_CLEARANCE
-NUT_POCKET_DEPTH = NUT_THICKNESS - NUT_PROUD
+PLATE_THICKNESS = SCREW_LENGTH - BOARD_THICKNESS + SCREW_TIP_CLEARANCE
+NUT_CAVITY_DEPTH = NUT_THICKNESS + NUT_CAVITY_CLEARANCE
+NUT_CAVITY_FRONT = PLATE_THICKNESS - NUT_WALL_THICKNESS
+NUT_CAVITY_BACK = NUT_CAVITY_FRONT - NUT_CAVITY_DEPTH
 NUT_CHANNEL_HEIGHT = NUT_ACROSS_FLATS + NUT_CHANNEL_CLEARANCE
 SCREW_SLOT_WIDTH = SCREW_DIAMETER + SCREW_CLEARANCE
 # +-6 mm. The reported error is 3-5 mm; this also swallows 12 mm of error in
@@ -270,12 +287,24 @@ def _check_mount_fits():
     lowest = top_mount_z() - (mount_rows() - 1) * BOARD_PITCH
     if lowest - NUT_CHANNEL_HEIGHT / 2.0 < MOUNT_EDGE_MARGIN:
         raise RuntimeError("bottom channel runs off the bottom of the plate")
-    tip = PLATE_THICKNESS + BOARD_THICKNESS + NUT_PROUD - SCREW_LENGTH
+    tip = PLATE_THICKNESS + BOARD_THICKNESS - SCREW_LENGTH
     if tip < 0.5:
         raise RuntimeError(
             f"a {SCREW_LENGTH} mm screw through a {BOARD_THICKNESS} mm board "
             f"ends {tip:.2f} mm from the plate's back face -- it would foul "
             "the upright's face metal"
+        )
+    if tip > NUT_CAVITY_BACK - 1.0:
+        raise RuntimeError(
+            f"the screw tip reaches x={tip:.2f} mm but the nut's cavity ends "
+            f"at {NUT_CAVITY_BACK:.2f} mm: the tip would bottom out in the "
+            "cavity instead of passing behind the nut"
+        )
+    if NUT_CAVITY_BACK < 1.5:
+        raise RuntimeError(
+            f"only {NUT_CAVITY_BACK:.2f} mm of plate behind the nut cavity; "
+            f"lower nutWallThickness (now {NUT_WALL_THICKNESS} mm) or thicken "
+            "the plate"
         )
     if not _is_coupon():
         for pitches, rise, rows, miss in bracket_spacing_options():
@@ -286,8 +315,12 @@ def _check_mount_fits():
             )
     print(
         f"  plate {min(low, high):+.1f}..{max(low, high):+.1f} mm, "
-        f"channel gaps {gaps[0]:.2f} / {gaps[1]:.2f} mm, "
-        f"screw tip stops {tip:.2f} mm short of the back face"
+        f"channel gaps {gaps[0]:.2f} / {gaps[1]:.2f} mm"
+    )
+    print(
+        f"  cavity x {NUT_CAVITY_BACK:.1f}..{NUT_CAVITY_FRONT:.1f} mm behind a "
+        f"{NUT_WALL_THICKNESS} mm wall, {NUT_THICKNESS} mm of thread engaged, "
+        f"screw tip stops at x={tip:.2f} mm"
     )
 
 
@@ -349,15 +382,24 @@ def parameters():
             "mm",
             "slack around the nut in its channel",
         ),
-        "nutProud": (NUT_PROUD, "mm", "nut stands out of the pocket to be clamped"),
-        "nutPocketDepth": ("nutThickness - nutProud", "mm", "channel depth"),
+        "nutCavityClearance": (
+            NUT_CAVITY_CLEARANCE,
+            "mm",
+            "slack across the nut's thickness",
+        ),
+        "nutWallThickness": (
+            NUT_WALL_THICKNESS,
+            "mm",
+            "wall in front of the nut; the screw pulls the nut against it",
+        ),
+        "nutCavityDepth": ("nutThickness + nutCavityClearance", "mm", "cavity depth"),
         "nutChannelHeight": (
             "nutAcrossFlats + nutChannelClearance",
             "mm",
             "channel height; under the nut's diagonal so it cannot turn",
         ),
         "plateThickness": (
-            "screwLength - boardThickness - nutProud + screwTipClearance",
+            "screwLength - boardThickness + screwTipClearance",
             "mm",
             "derived: deep enough to swallow the screw",
         ),
@@ -472,14 +514,39 @@ def _ensure_parameters(design):
 
 
 def _drop_stale_parameters(design):
-    """Delete parameters this script no longer declares, or that changed unit."""
+    """Delete parameters this script no longer declares, or that changed unit.
+
+    Loops, because Fusion refuses to delete a parameter another parameter's
+    expression still mentions. Dropping nutProud failed while plateThickness
+    was still written as "... - nutProud", and the build then died in the
+    audit on a parameter it had reported as removed. Callers run this between
+    two _ensure_parameters passes so live expressions are rewritten first and
+    the stale ones are genuinely unreferenced by the time they are deleted.
+    """
     user_parameters = design.userParameters
-    for index in range(user_parameters.count - 1, -1, -1):
-        parameter = user_parameters.item(index)
-        expected = parameters().get(parameter.name)
-        if expected is None or parameter.unit != expected[1]:
-            print(f"  dropping stale parameter {parameter.name}")
-            parameter.deleteMe()
+    while True:
+        stale = [
+            user_parameters.item(index)
+            for index in range(user_parameters.count - 1, -1, -1)
+            if parameters().get(user_parameters.item(index).name) is None
+            or user_parameters.item(index).unit
+            != parameters()[user_parameters.item(index).name][1]
+        ]
+        if not stale:
+            return
+        removed = []
+        for parameter in stale:
+            name = parameter.name
+            if parameter.deleteMe():
+                removed.append(name)
+        for name in removed:
+            print(f"  dropped stale parameter {name}")
+        if not removed:
+            raise RuntimeError(
+                "cannot delete stale parameters "
+                f"{[parameter.name for parameter in stale]}: something still "
+                "references them"
+            )
 
 
 def _build_plate(component, plane):
@@ -700,54 +767,57 @@ def _pattern_down(component, feature, name):
     patterns.add(pattern_input).name = name
 
 
-def _build_mounts(component, plane):
-    """The nut channel and the screw relief behind it, one row per mount.
+def _cavity_extent():
+    """(width, offset) expressions that run the cavity out the outboard edge.
 
-    Two cuts, both open to the front face where the board lands:
-
-      * the channel, nutPocketDepth deep, nutChannelHeight tall. The nut
-        lives here and slides along it. It is deliberately shallower than
-        the nut is thick so the screw clamps the nut to the channel floor.
-      * the screw relief, straight through to the plate's back face. It has
-        to be through rather than blind: 15 mm of screw minus a 6 mm board
-        is 9 mm behind the board, and a blind floor is one more thing to
-        bottom out on if the screw or the board is not what we measured.
-
-    The relief is shorter and narrower than the channel, so the channel
-    always has a floor for the nut to be clamped against, whatever position
-    along the travel it ends up in.
+    The cavity is loaded from the SIDE, not through the board: slide the nut
+    in from the plate's outboard edge before the bracket ever goes on the
+    desk. So it has to break out of that edge, and its far end stops where
+    the nut's travel stops. Inboard is +Y on the left bracket and -Y on the
+    right, and mountOffsetY carries its own sign, so the two hands need
+    mirrored expressions rather than one with an abs() in it.
     """
-    face = PLATE_THICKNESS
-    channel_z = top_mount_z()
-    channel = _cut_rectangle(
-        component,
-        plane,
-        "Nut channel",
-        (
-            face - NUT_POCKET_DEPTH,
-            face + SLOT_OVERSHOOT,
-            channel_z - NUT_CHANNEL_HEIGHT / 2.0,
-            channel_z + NUT_CHANNEL_HEIGHT / 2.0,
-        ),
-        (
-            "plateThickness + slotOvershoot",
-            "topMountZ - nutChannelHeight / 2",
-            "nutPocketDepth + slotOvershoot",
-            "nutChannelHeight",
-        ),
-        "nutChannelLength",
-        "mountOffsetY",
+    if BUILD_VARIANT == "right":
+        return (
+            "-mountOffsetY + nutChannelLength / 2 + bracketWidth / 2 + slotOvershoot",
+            "(mountOffsetY - nutChannelLength / 2 + bracketWidth / 2"
+            " + slotOvershoot) / 2",
+        )
+    return (
+        "mountOffsetY + nutChannelLength / 2 + bracketWidth / 2 + slotOvershoot",
+        "(mountOffsetY + nutChannelLength / 2 - bracketWidth / 2 - slotOvershoot) / 2",
     )
-    _pattern_down(component, channel, "Nut channel rows")
-    relief = _cut_rectangle(
+
+
+def _build_mounts(component, plane):
+    """The captured nut cavity and the screw hole that reaches it.
+
+    Two cuts, and the order they appear in the part front to back is:
+
+      plateThickness .. -nutWallThickness   solid wall the board clamps to,
+                                            pierced only by the screw slot
+      the cavity, nutCavityDepth deep       the nut, enclosed on the board
+                                            side, open only at the outboard
+                                            edge it slides in from
+      the rest of the plate                 pierced by the same screw slot so
+                                            the tip has somewhere to go
+
+    Tightening pulls the nut FORWARD onto the wall and clamps the board
+    between the screw head and a flat plate face. The open channel this
+    replaces had no wall: the board covered the pocket, so the nut had to be
+    posted through a board slot with the board already hanging, and the joint
+    clamped board-to-nut rather than board-to-plate.
+    """
+    mount_z = top_mount_z()
+    screw = _cut_rectangle(
         component,
         plane,
-        "Screw relief",
+        "Screw hole",
         (
             -SLOT_OVERSHOOT,
-            face + SLOT_OVERSHOOT,
-            channel_z - SCREW_SLOT_WIDTH / 2.0,
-            channel_z + SCREW_SLOT_WIDTH / 2.0,
+            PLATE_THICKNESS + SLOT_OVERSHOOT,
+            mount_z - SCREW_SLOT_WIDTH / 2.0,
+            mount_z + SCREW_SLOT_WIDTH / 2.0,
         ),
         (
             "plateThickness + slotOvershoot",
@@ -758,7 +828,28 @@ def _build_mounts(component, plane):
         "screwSlotLength",
         "mountOffsetY",
     )
-    _pattern_down(component, relief, "Screw relief rows")
+    _pattern_down(component, screw, "Screw hole rows")
+    width_expression, offset_expression = _cavity_extent()
+    cavity = _cut_rectangle(
+        component,
+        plane,
+        "Nut cavity",
+        (
+            NUT_CAVITY_BACK,
+            NUT_CAVITY_FRONT,
+            mount_z - NUT_CHANNEL_HEIGHT / 2.0,
+            mount_z + NUT_CHANNEL_HEIGHT / 2.0,
+        ),
+        (
+            "plateThickness - nutWallThickness",
+            "topMountZ - nutChannelHeight / 2",
+            "nutCavityDepth",
+            "nutChannelHeight",
+        ),
+        width_expression,
+        offset_expression,
+    )
+    _pattern_down(component, cavity, "Nut cavity rows")
 
 
 def _probe(body, x_mm, y_mm, z_mm):
@@ -902,12 +993,13 @@ def _verify(body):  # pylint: disable=too-many-locals
     """Numeric probes; raise on any surprise so the failure is loud."""
     inside = adsk.fusion.PointContainment.PointInsidePointContainment
     outside = adsk.fusion.PointContainment.PointOutsidePointContainment
-    face = PLATE_THICKNESS
-    pocket_mid_x = face - NUT_POCKET_DEPTH / 2.0
-    behind_floor_x = face - NUT_POCKET_DEPTH - 1.0
+    cavity_mid_x = (NUT_CAVITY_BACK + NUT_CAVITY_FRONT) / 2.0
+    wall_mid_x = NUT_CAVITY_FRONT + NUT_WALL_THICKNESS / 2.0
     offset = mount_offset()
+    outboard_edge = plate_span()[0]
+    inboard = 1.0 if offset >= 0 else -1.0
     above_channel_z = top_mount_z() + NUT_CHANNEL_HEIGHT / 2.0 + 2.0
-    checks = [("plate interior", face / 2.0, 0.0, above_channel_z, inside)]
+    checks = [("plate interior", PLATE_THICKNESS / 2.0, 0.0, above_channel_z, inside)]
     if not _is_coupon():
         lip_mid_x = -(HOOK_THROAT + HOOK_LIP_THICKNESS / 2.0)
         for row in range(HOOK_ROWS):
@@ -916,58 +1008,69 @@ def _verify(body):  # pylint: disable=too-many-locals
             checks.append((f"hook row {row} lip", lip_mid_x, 0.0, lip_z, inside))
     for row in range(mount_rows()):
         mount_z = top_mount_z() - row * BOARD_PITCH
-        beyond = NUT_CHANNEL_LENGTH / 2.0 + 1.0
+        beyond = offset + inboard * (NUT_CHANNEL_LENGTH / 2.0 + 1.5)
         checks += [
-            (f"row {row} channel open", pocket_mid_x, offset, mount_z, outside),
-            (f"row {row} relief through", 0.5, offset, mount_z, outside),
+            # The cavity is open where the nut goes in and closed where the
+            # board lands: that pair of probes is the whole design change.
+            (f"row {row} cavity open", cavity_mid_x, offset, mount_z, outside),
+            # Off the screw's centreline: the wall is pierced by the screw
+            # hole, so probing dead centre only ever finds the hole.
             (
-                f"row {row} channel floor",
-                behind_floor_x,
+                f"row {row} wall closed",
+                wall_mid_x,
                 offset,
                 mount_z + SCREW_SLOT_WIDTH / 2.0 + 1.0,
                 inside,
             ),
             (
+                f"row {row} wall closed off centre",
+                wall_mid_x,
+                offset + inboard * (MOUNT_TRAVEL / 2.0),
+                mount_z + NUT_CHANNEL_HEIGHT / 2.0 - 1.0,
+                inside,
+            ),
+            (
+                f"row {row} screw through front",
+                PLATE_THICKNESS - 0.5,
+                offset,
+                mount_z,
+                outside,
+            ),
+            (f"row {row} screw through back", 0.5, offset, mount_z, outside),
+            (
+                f"row {row} cavity reaches the edge",
+                cavity_mid_x,
+                outboard_edge + inboard * 0.5,
+                mount_z,
+                outside,
+            ),
+            (
+                f"row {row} cavity ends inboard",
+                cavity_mid_x,
+                beyond,
+                mount_z,
+                inside,
+            ),
+            (
                 f"row {row} nut cannot turn",
-                pocket_mid_x,
+                cavity_mid_x,
                 offset,
                 mount_z + NUT_CHANNEL_HEIGHT / 2.0 + 1.0,
                 inside,
             ),
             (
                 f"row {row} travel inboard",
-                pocket_mid_x,
-                offset + MOUNT_TRAVEL / 2.0,
+                cavity_mid_x,
+                offset + inboard * MOUNT_TRAVEL / 2.0,
                 mount_z,
                 outside,
-            ),
-            (
-                f"row {row} travel outboard",
-                pocket_mid_x,
-                offset - MOUNT_TRAVEL / 2.0,
-                mount_z,
-                outside,
-            ),
-            (
-                f"row {row} plate past channel",
-                pocket_mid_x,
-                offset + beyond,
-                mount_z,
-                inside,
-            ),
-            (
-                f"row {row} plate before channel",
-                pocket_mid_x,
-                offset - beyond,
-                mount_z,
-                inside,
             ),
         ]
     failures = []
     for label, x_mm, y_mm, z_mm, expected in checks:
         actual = _probe(body, x_mm, y_mm, z_mm)
         state = "ok" if actual == expected else f"FAIL (got {actual})"
-        print(f"  probe {label:28s} ({x_mm:6.1f},{y_mm:6.1f},{z_mm:6.1f}) {state}")
+        print(f"  probe {label:32s} ({x_mm:6.1f},{y_mm:6.1f},{z_mm:6.1f}) {state}")
         if actual != expected:
             failures.append(label)
     if failures:
@@ -994,8 +1097,13 @@ def run(_context: str):
     if data_file is not None:
         _refuse_if_hand_edited(data_file, design)
         _clear_timeline(design)
-        _drop_stale_parameters(design)
+    # Three steps, in this order and not two: rewrite live expressions so they
+    # stop mentioning parameters that are going away, delete those, then
+    # ensure again to restore anything dropped only because its unit changed.
     _ensure_parameters(design)
+    if data_file is not None:
+        _drop_stale_parameters(design)
+        _ensure_parameters(design)
     component = design.rootComponent
     plane = component.xZConstructionPlane
     _check_mount_fits()

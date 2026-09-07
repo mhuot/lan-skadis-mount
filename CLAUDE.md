@@ -1,24 +1,34 @@
 # lan-skadis-mount
 
 3D-printed brackets that hang a board on the slotted DuraFrame uprights of
-an Ergotron LAN Organizer 3000. Three designs: the **SKÅDIS nut-channel
-bracket (current)**, the SKÅDIS peg bracket it replaced, and hardware-store
-pegboard bolted on with 1/4-20.
+an Ergotron LAN Organizer 3000. Two designs: the **SKÅDIS captured-nut
+bracket (current)** and hardware-store pegboard bolted on with 1/4-20.
 
-The peg bracket works — a board hung on four of them — but has no adjustment
-anywhere, and came out 3-5 mm off left to right with nothing to turn. The
-nut-channel bracket carries an M4 square nut in a horizontal channel with
-12 mm of slide, so the board is positioned at assembly rather than at
-slicing. Keep the peg script; it is a working design, not a mistake.
+An M4 square nut lives in a cavity INSIDE the plate, closed on the board
+side by a 3 mm wall and open only at the plate's outboard edge, which is
+where it slides in. 12 mm of slide = the left-right adjustment, so the board
+is positioned at assembly rather than at slicing. Tightening pulls the nut
+forward onto the wall and clamps the board between the screw head and a flat
+plate face.
+
+Two designs preceded it and were deleted, not kept as variants: printed pegs
+(worked, but zero adjustment, 3-5 mm out left to right) and an open channel
+milled in the face (adjustable, but the board covered the pocket, so the nut
+had to be posted through a board slot with the board already hanging). Do
+not reintroduce either; git history has both.
 
 ## Source of truth
 
 - `scripts/build_skadis_nut_bracket.py` builds the current bracket
-  (`--variant left|right|coupon`); `scripts/build_skadis_bracket.py` builds
-  the older peg bracket (`--variant left|right`); `build_pegboard_bracket.py`
-  builds the bolt-through pegboard bracket. All dimensions live at the top of
-  each file; no shared params module (see the module-caching trap in the
-  fusion-360-mcp skill).
+  (`--variant left|right|coupon`); `build_pegboard_bracket.py` builds the
+  bolt-through pegboard bracket. All dimensions live at the top of each file;
+  no shared params module (see the module-caching trap in the fusion-360-mcp
+  skill).
+- Parameter housekeeping runs ensure -> drop -> ensure, in that order.
+  Fusion refuses to delete a parameter another expression still mentions, so
+  dropping nutProud failed while plateThickness was still written as
+  "... - nutProud", and the build then died in its own audit on a parameter
+  it had just reported as removed.
 - Two numbers in the nut bracket are MEASURED and everything hangs off them:
   the board is **6.0 mm** (not the 4.6 the community libraries quote — the
   peg bracket's roots were 1.4 mm short of reaching through because of it)
@@ -40,8 +50,9 @@ slicing. Keep the peg script; it is a working design, not a mistake.
 - Builds land in the Fusion cloud project **"LAN Pegboard Mount"** (named
   before the repo was renamed to lan-skadis-mount; FUSION_PROJECT_NAME in
   each script must keep matching the cloud project, so do not rename one
-  without the other) as the documents "Pegboard Mount Bracket", "SKADIS
-  Bracket Left/Right" and "SKADIS Nut Bracket Left/Right/Coupon"; each run
+  without the other) as the documents "Pegboard Mount Bracket", "SKADIS Nut
+  Bracket Left/Right/Coupon" (the peg design's documents are stale, and are
+  left alone rather than deleted from the cloud without asking); each run
   saves a new version recording its body volume. EVERY
   user parameter drives geometry — hooks, plate, bolt slots and nut tracks
   alike — and the build fails if one goes inert or carries a wrong unit.
@@ -92,8 +103,8 @@ under ~2.6 mm for a 3.2 mm slot. PETG welds to organic supports; use a
 
 ## Third-party models
 
-WegBier's "Skadis to Kallax mount adapter" (Printables 137113) inspired the
-SKÅDIS peg approach and is CC BY-NC-SA — incompatible with this repo's MIT
+WegBier's "Skadis to Kallax mount adapter" (Printables 137113) is where this
+project started and is CC BY-NC-SA — incompatible with this repo's MIT
 licence. Its geometry is deliberately NOT reproduced; the peg is built from
 published SKÅDIS interface dimensions, which are measurements of IKEA's
 product. Keep it that way: cite inspiration, implement independently, and

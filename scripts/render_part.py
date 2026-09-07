@@ -93,15 +93,35 @@ def render(mesh, azimuth_deg, elevation_deg):
     return (np.clip(image, 0, 1) * 255).astype(np.uint8)
 
 
+def sectioned(mesh, axis, at_mm):
+    """Cut the mesh with a plane and cap it, so internal voids are visible.
+
+    A captured cavity is invisible from outside by definition, which is the
+    whole point of it and also the whole problem with rendering it.
+    """
+    normal = {"x": [1.0, 0, 0], "y": [0, 1.0, 0], "z": [0, 0, 1.0]}[axis]
+    origin = [value * at_mm for value in normal]
+    half = mesh.slice_plane(
+        plane_origin=origin, plane_normal=[-value for value in normal], cap=True
+    )
+    if half is None or half.is_empty:
+        raise SystemExit(f"section at {axis}={at_mm} removed the whole part")
+    return half
+
+
 def main():
-    """Render one STL from one viewpoint."""
+    """Render one STL from one viewpoint, optionally cut open."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("stl")
     parser.add_argument("png")
     parser.add_argument("--azimuth", type=float, default=35.0)
     parser.add_argument("--elevation", type=float, default=20.0)
+    parser.add_argument("--section-axis", choices=("x", "y", "z"))
+    parser.add_argument("--section-at", type=float, default=0.0)
     arguments = parser.parse_args()
     mesh = trimesh.load(arguments.stl, force="mesh")
+    if arguments.section_axis:
+        mesh = sectioned(mesh, arguments.section_axis, arguments.section_at)
     Image.fromarray(render(mesh, arguments.azimuth, arguments.elevation)).save(
         arguments.png
     )

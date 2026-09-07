@@ -10,39 +10,52 @@ the hook that grips the upright is the one already fit-verified on the real
 desk.
 
 <p align="center">
-  <img src="docs/images/nut_bracket_front.png" width="46%" alt="Front of the bracket, showing the nut channel">
-  <img src="docs/images/nut_bracket_hooks.png" width="46%" alt="Back of the bracket, showing the two blade hooks">
+  <img src="docs/images/nut_bracket_front.png" width="31%" alt="Front of the bracket: flat but for the screw slot">
+  <img src="docs/images/nut_bracket_edge.png" width="31%" alt="Outboard edge of the bracket, showing the cavity the nut slides into">
+  <img src="docs/images/nut_bracket_section.png" width="31%" alt="Section through the bracket, showing the nut cavity behind a solid wall">
 </p>
 
 ## The parts
 
 | Part | Script | State |
 | --- | --- | --- |
-| **SKÅDIS nut-channel bracket** | `build_skadis_nut_bracket.py` | current design |
-| SKÅDIS peg bracket | `build_skadis_bracket.py` | works, but has no adjustment |
+| **SKÅDIS captured-nut bracket** | `build_skadis_nut_bracket.py` | current design |
 | Pegboard bolt-through bracket | `build_pegboard_bracket.py` | for 1/4"-hole pegboard |
 
-### Why the peg bracket was replaced
+### The joint
 
-It works — a board hung on four of them, both ends engaged. But it has no
-adjustment anywhere. Four rigid posts have to enter four slots at once, so
-every error in the upright measurement, in print shrinkage and in the
-board's own tolerance lands on whoever is holding the board. Measured 3–5 mm
-out left to right, with nothing to turn.
+A **DIN 562 M4 square nut** lives in a cavity *inside* the plate:
 
-The nut-channel bracket puts that adjustment back:
-
-- A **DIN 562 M4 square nut** feeds edgewise through a SKÅDIS slot (2.2 mm
-  thick passes the 5 mm slot), turns flat behind the board, and drops into a
-  horizontal channel in the plate's face.
-- The channel is **12 mm longer than the nut**, and that length is the
-  left-right adjustment. Slide the board, then tighten.
+- The cavity is enclosed on the board side by **3 mm of solid wall**. The
+  board lands on a flat face; nothing but the screw slot breaks it.
+- It breaks out of the plate's **outboard edge and nowhere else**, so the
+  nut slides in from the side with the bracket in your hand, before it ever
+  goes on the desk.
+- It is **12 mm longer than the nut**, and that length is the left-right
+  adjustment. Slide, then tighten.
 - It is **7.4 mm tall against a 7.0 mm nut**, well under the nut's 9.9 mm
   diagonal, so the nut cannot rotate and the screw can be tightened
   one-handed from the front.
-- The nut stands **0.2 mm proud** of its pocket, so tightening clamps it to
-  the channel floor. Flush or recessed, and it slides back out of adjustment
-  the moment you let go.
+- The IKEA decorative M4 screw goes in through the board, through the wall,
+  into the nut, and its tip passes behind the nut in the same slot.
+  Tightening pulls the nut **forward onto the wall** and clamps the board
+  between the screw head and the plate.
+
+### What this replaced
+
+First an open channel milled into the plate's face, and before that, printed
+pegs. The pegs worked — a board hung on four of them, both ends engaged —
+but had no adjustment anywhere: four rigid posts have to enter four slots at
+once, so every error in the upright measurement, in print shrinkage and in
+the board's own tolerance landed on whoever was holding the board. Measured
+3–5 mm out left to right, with nothing to turn. It has been deleted rather
+than kept as a variant; git history has it.
+
+The open channel fixed the adjustment but left the pocket facing the board,
+which meant the nut had to be posted through a board slot with the board
+already hanging, the joint clamped board-to-nut instead of board-to-plate,
+and the board rested on the nuts rather than flat on the plate. Enclosing
+the cavity fixes all three.
 
 ## Measured, not assumed
 
@@ -60,13 +73,14 @@ every one that was measured has held. These are the measured ones.
 That board thickness matters more than it looks. The peg bracket built its
 roots as `boardThickness + 0.2`, so against a real 6.0 mm board its pegs were
 **1.4 mm short of reaching through** and the prong clamped the board instead
-of standing clear in front of it.
+of standing clear in front of it. The nut is confirmed: a DIN 562 M4 square
+nut fits the cavity as built.
 
 ## The plate thickness is derived, not chosen
 
 ```
-plateThickness = screwLength - boardThickness - nutProud + screwTipClearance
-               = 15.0 - 6.0 - 0.2 + 2.2
+plateThickness = screwLength - boardThickness + screwTipClearance
+               = 15.0 - 6.0 + 2.0
                = 11.0 mm
 ```
 
@@ -74,7 +88,8 @@ A 15 mm screw through a 6 mm board leaves 9 mm behind the board with nowhere
 to go. In the peg bracket's 5.4 mm plate the tip would have stood proud of
 the back face and jammed against the upright's face metal. Change the screw
 and the plate follows; the build refuses outright if the tip comes within
-0.5 mm of the back face.
+0.5 mm of the back face, or if it would bottom out inside the nut's cavity
+instead of passing behind it.
 
 A useful side effect: bending stiffness goes as thickness cubed, so 5.4 →
 11.0 mm is **8.5× stiffer** out of plane. At the worst nut position, a
@@ -103,11 +118,16 @@ slot column falls at a 735.04 mm upright spacing.
 
 ## Printing
 
-Lay the bracket on a side face — model Y vertical, `--rotate-x 90` — so the
-hook profile is drawn inside every layer instead of stacked across them. In
-that orientation **the channel and the screw relief need no support at all**
-(they run along the build direction), and organic supports grow only under
-the two hooks, from the bed to about 23 mm.
+Lay the bracket on a side face — model Y vertical — so the hook profile is
+drawn inside every layer instead of stacked across them. In that orientation
+**the cavity and the screw slot need no support at all** (they run along the
+build direction), and organic supports grow only under the two hooks.
+
+Put the **outboard edge on the bed** so the cavity opens downward and prints
+as a plain vertical channel; the other way up its ceiling is an unsupported
+overhang. That is `--rotate-x 90` for the **left** bracket and
+`--rotate-x -90` for the **right** — the two hands are mirrored, so they do
+not share a rotation.
 
 - **ASA** for the real set: it creeps less than PETG under the permanent
   tension in the hooks. PETG is fine for a fit test.
