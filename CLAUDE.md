@@ -110,17 +110,29 @@ document from scratch, so a hand edit is something a rebuild would destroy:
 
 ## Printing
 
-On a side face (`--rotate-x 90`), like the spool brackets, so the hook
-profile is drawn inside every layer rather than stacked across them. In that
-orientation the nut channel and screw relief need NO support — they run
-along the build direction — and organic supports grow only under the two
-hooks. ASA for the real set (it creeps less than PETG under the hooks'
-permanent tension), 4 perimeters, 40% infill.
+On a side face, like the spool brackets, so the hook profile is drawn inside
+every layer rather than stacked across them. In that orientation the cavity,
+the entry and the screw slot need NO support -- they run along the build
+direction -- and organic supports grow only under the two hooks.
+
+Put the INBOARD edge on the bed, so the cavity's ROOFED outboard end is
+uppermost: `--rotate-x -90` for the LEFT bracket and `--rotate-x 90` for the
+RIGHT. The hands are mirrored and do not share a rotation. The other way up
+leaves the flat inboard end as a 3.4 mm ceiling and the slicer grows organic
+support up inside the cavity to hold it -- where the nut has to slide and
+where nothing can reach. `--support-material-buildplate-only` does NOT stop
+that; the tree routes out through the screw slot. Supports reach z 29.0 the
+wrong way up and z 21.6 the right way up, and the 21.6 is the hooks.
+
+PETG is sufficient and arguably better than ASA here: stresses run 2-5% of
+yield and the 2.4 mm hook tab is tougher in PETG. 4 perimeters, 40% infill,
+5 mm brim, organic supports at 0.25 mm contact distance (PETG welds to them
+at the stock 0.2). About 16 g and an hour per bracket. ASA is for the spool
+cradle, whose hooks carry ~10x more.
 
 The supports touch the side face of the hook tabs, which is the face that
 enters the slot: caliper a tab after cleanup, nominal 2.4 mm, must stay
-under ~2.6 mm for a 3.2 mm slot. PETG welds to organic supports; use a
-0.25 mm contact distance.
+under ~2.6 mm for a 3.2 mm slot.
 
 ## Third-party models
 
