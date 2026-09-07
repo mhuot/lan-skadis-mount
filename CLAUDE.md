@@ -33,13 +33,17 @@ not reintroduce either; git history has both.
   the board is **6.0 mm** (not the 4.6 the community libraries quote — the
   peg bracket's roots were 1.4 mm short of reaching through because of it)
   and the decorative screw is **15 mm**. `plateThickness` is DERIVED from
-  those, not chosen: 15 - 6 - 0.2 + 2.2 = 11.0 mm, deep enough that the tip
+  those, not chosen: 15 - 6 + 2.0 = 11.0 mm, deep enough that the tip
   stops short of the back face instead of fouling the upright's face metal.
   Never hand-set it; change the screw or board and let it follow.
 - With one channel per bracket, vertical alignment lives in the ASSEMBLY:
-  the upright is on 25.4 mm and the board on 40 mm. Stack two brackets
-  3 pitches apart (76.2 vs 80 mm) or 8 (203.2 vs 200). Two pitches misses by
-  10.8 of the 11.0 mm a screw has inside its slot. The build prints the list.
+  the upright is on 25.4 mm and the board on 40 mm. WIDER IS BETTER -- the
+  two brackets on an upright are what stop the board rotating and the
+  spacing is the moment arm -- so 19 pitches (482.6 vs 480, off 2.6) on a
+  56 cm board, which lands them ~15 mm inside each corner. 3 pitches (76.2)
+  is equally valid and bunches all four across the middle of the board. Two
+  pitches misses by 10.8 of the 11.0 mm a screw has inside its slot. The
+  build prints the whole list, searched out to 20 pitches.
 - Upright spacing is MEASURED, not nominal: `SLOT_INSIDE_GAP` = 731.84 mm
   between the facing edges of the two slot columns, + one slot width =
   735.04 mm centres, giving peg offsets of ±7.52 mm inboard. The nominal

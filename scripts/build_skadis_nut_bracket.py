@@ -200,7 +200,7 @@ def mount_rows():
     return 1 if _is_coupon() else MOUNT_ROWS
 
 
-def bracket_spacing_options(limit=9):
+def bracket_spacing_options(limit=20):
     """Vertical spacings, in hook pitches, that two brackets can share.
 
     With one channel per bracket the vertical alignment moves out of the
@@ -210,6 +210,13 @@ def bracket_spacing_options(limit=9):
     a spacing works only if some whole number of board pitches lands inside
     that. 2 x 25.4 = 50.8 against 40 misses by 10.8 of an available 11.0 and
     is not a spacing to trust; 3 x 25.4 = 76.2 against 80 misses by 3.8.
+
+    Search well past the first hit, because any of these works but WIDER IS
+    BETTER: the pair of brackets on one upright is what stops the board
+    rotating, and the moment arm is the spacing between them. 3 pitches is
+    valid and bunches all four brackets into a band across the middle of the
+    board; 19 pitches (482.6 against 480, off 2.6) puts them about 39 mm
+    inside each corner of a 56 cm board. Take the widest that fits.
     """
     play = BOARD_SLOT_HEIGHT - SCREW_DIAMETER
     options = []

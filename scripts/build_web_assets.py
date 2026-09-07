@@ -38,7 +38,12 @@ PLATE_HEIGHT = 48.0
 CHANNEL_Z = PLATE_HEIGHT / 2.0
 MOUNT_OFFSET = 7.52
 NUT_PROUD = 0.2
-BRACKET_RISE = 76.2  # 3 hook pitches: the spacing that lands on board rows
+# 19 hook pitches against 12 board rows: 482.6 vs 480, off by 2.6 mm of the
+# 11 mm a screw has inside its slot. On a 560 mm board that puts the four
+# brackets about 39 mm inside each corner, which is where they belong -- a
+# tighter valid spacing like 3 pitches (76.2 mm) bunches all four into a
+# band across the middle and gives the board almost no leverage arm.
+BRACKET_RISE = 482.6
 
 BOARD_WIDTH = 760.0
 BOARD_HEIGHT = 560.0
@@ -211,12 +216,13 @@ def build_scene():
     parts = []
     channel_zs = [CHANNEL_Z, CHANNEL_Z + BRACKET_RISE]
 
+    board_centre_z = sum(channel_zs) / 2.0
     for sign, part in ((-1.0, left), (1.0, right)):
         column_y = sign * UPRIGHT_SPACING / 2.0
         parts.append(
             box(
                 [UPRIGHT_DEPTH, UPRIGHT_WIDTH, UPRIGHT_HEIGHT],
-                (-UPRIGHT_DEPTH / 2.0, column_y, UPRIGHT_HEIGHT / 2.0 - 240.0),
+                (-UPRIGHT_DEPTH / 2.0, column_y, board_centre_z),
                 "upright",
             )
         )
@@ -225,7 +231,6 @@ def build_scene():
         for channel_z in channel_zs:
             parts.append(screw(column_y + sign * -MOUNT_OFFSET, channel_z))
 
-    board_centre_z = sum(channel_zs) / 2.0
     parts.append(board(board_centre_z))
     return parts
 

@@ -82,10 +82,17 @@ moves vertical alignment out of the part and into the assembly — where the
 upright's **25.4 mm** pitch has to meet the board's **40 mm** pitch. A screw
 has 11 mm of freedom inside its 15 mm slot, so only some spacings work:
 
+**Wider is better.** The two brackets on one upright are what stop the board
+rotating, and the moment arm is the distance between them, so take the widest
+spacing your board has room for rather than the first one that works.
+
 | Brackets apart | Board rows | Mismatch | |
 | --- | --- | --- | --- |
-| 3 × 25.4 = **76.2 mm** | 2 × 40 = 80 mm | 3.8 mm | ✅ |
-| 8 × 25.4 = **203.2 mm** | 5 × 40 = 200 mm | 3.2 mm | ✅ better leverage |
+| 19 × 25.4 = **482.6 mm** | 12 × 40 = 480 mm | 2.6 mm | ✅ **pick this on a 56 cm board** — lands ~15 mm inside each corner |
+| 14 × 25.4 = 355.6 mm | 9 × 40 = 360 mm | 4.4 mm | ✅ |
+| 11 × 25.4 = 279.4 mm | 7 × 40 = 280 mm | 0.6 mm | ✅ tightest fit of any |
+| 8 × 25.4 = 203.2 mm | 5 × 40 = 200 mm | 3.2 mm | ✅ |
+| 3 × 25.4 = 76.2 mm | 2 × 40 = 80 mm | 3.8 mm | ✅ valid, but bunched in the middle |
 | 2 × 25.4 = 50.8 mm | 1 × 40 = 40 mm | 10.8 mm | ❌ of 11.0 available |
 | 1 × 25.4 = 25.4 mm | 1 × 40 = 40 mm | 14.6 mm | ❌ |
 
