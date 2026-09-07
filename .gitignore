@@ -3,3 +3,5 @@ __pycache__/
 *.gcode
 *.bgcode
 .DS_Store
+exports/skadis_one_*.stl
+exports/skadis_two_*.stl
