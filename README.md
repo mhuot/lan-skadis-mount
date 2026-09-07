@@ -41,22 +41,6 @@ A **DIN 562 M4 square nut** lives in a cavity *inside* the plate:
   Tightening pulls the nut **forward onto the wall** and clamps the board
   between the screw head and the plate.
 
-### What this replaced
-
-First an open channel milled into the plate's face, and before that, printed
-pegs. The pegs worked — a board hung on four of them, both ends engaged —
-but had no adjustment anywhere: four rigid posts have to enter four slots at
-once, so every error in the upright measurement, in print shrinkage and in
-the board's own tolerance landed on whoever was holding the board. Measured
-3–5 mm out left to right, with nothing to turn. It has been deleted rather
-than kept as a variant; git history has it.
-
-The open channel fixed the adjustment but left the pocket facing the board,
-which meant the nut had to be posted through a board slot with the board
-already hanging, the joint clamped board-to-nut instead of board-to-plate,
-and the board rested on the nuts rather than flat on the plate. Enclosing
-the cavity fixes all three.
-
 ## Measured, not assumed
 
 Every dimension in this project that was assumed turned out to be wrong, and
@@ -70,11 +54,7 @@ every one that was measured has held. These are the measured ones.
 | SKÅDIS slot | 5 × 15 mm on a 40 mm grid | second grid offset 20 mm both ways |
 | Decorative M4 screw | **15 mm** | the one IKEA ships |
 
-That board thickness matters more than it looks. The peg bracket built its
-roots as `boardThickness + 0.2`, so against a real 6.0 mm board its pegs were
-**1.4 mm short of reaching through** and the prong clamped the board instead
-of standing clear in front of it. The nut is confirmed: a DIN 562 M4 square
-nut fits the cavity as built.
+A DIN 562 M4 square nut is confirmed to fit the cavity as built.
 
 ## The plate thickness is derived, not chosen
 
@@ -85,17 +65,15 @@ plateThickness = screwLength - boardThickness + screwTipClearance
 ```
 
 A 15 mm screw through a 6 mm board leaves 9 mm behind the board with nowhere
-to go. In the peg bracket's 5.4 mm plate the tip would have stood proud of
-the back face and jammed against the upright's face metal. Change the screw
-and the plate follows; the build refuses outright if the tip comes within
-0.5 mm of the back face, or if it would bottom out inside the nut's cavity
-instead of passing behind it.
+to go — a thinner plate would let the tip stand proud of its own back face
+and jam against the upright's steel. Change the screw and the plate follows;
+the build refuses outright if the tip comes within 0.5 mm of the back face,
+or if it would bottom out inside the nut's cavity instead of passing behind
+it.
 
-A useful side effect: bending stiffness goes as thickness cubed, so 5.4 →
-11.0 mm is **8.5× stiffer** out of plane. At the worst nut position, a
-bracket's share of a 15 kg loaded board works out to 0.118 MPa against ASA's
-~45 MPa — a 380× margin — which is why the inboard extension carries no
-stiffening rib.
+At the worst nut position, a bracket's share of a 15 kg loaded board works
+out to 0.118 MPa against PETG's ~50 MPa — a 400× margin — which is why the
+inboard extension carries no stiffening rib.
 
 ## Mounting: the two grids do not agree
 
@@ -176,11 +154,12 @@ and counts unitless — the build fails if that stops being true, and
 
 ## Attribution
 
-The idea of hanging a SKÅDIS on printed pegs rather than bolting through it
-comes from [Skadis to Kallax mount adapter](https://www.printables.com/model/137113-skadis-to-kallax-mount-adapter)
-by **WegBier**, licensed CC BY-NC-SA. That licence is incompatible with this
-repository's MIT licence, so **none of that model's geometry is reproduced
-here** — and the current design does not use a peg at all.
+This project started from [Skadis to Kallax mount adapter](https://www.printables.com/model/137113-skadis-to-kallax-mount-adapter)
+by **WegBier**, licensed CC BY-NC-SA, which is where the idea of mounting to
+SKÅDIS with a printed part rather than bolting through it came from. That
+licence is incompatible with this repository's MIT licence, so **none of
+that model's geometry has ever been reproduced here**, and this design
+shares no feature with it.
 
 SKÅDIS interface dimensions are measurements of IKEA's product rather than
 anyone's authorship, cross-checked against
