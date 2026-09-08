@@ -282,7 +282,7 @@
 <section id="joint">
   <span class="eyebrow">The joint</span>
   <h2>A square nut, sealed inside the plate</h2>
-  <p class="big">An M4 square nut, measured 7&nbsp;×&nbsp;7&nbsp;×&nbsp;3&nbsp;mm, drops in through a short entry from the plate's top edge while the bracket is still in your hand, and after that it is captive: closed at both ends, closed on the board side, and the only way out is back up that entry, which gravity never allows once the bracket is hanging.</p>
+  <p class="big">An M4 square nut, 7&nbsp;×&nbsp;7&nbsp;×&nbsp;3&nbsp;mm, drops in through a short entry from the plate's top edge while the bracket is still in your hand, and after that it is captive: closed at both ends, closed on the board side, and the only way out is back up that entry, which gravity never allows once the bracket is hanging.</p>
   <div class="figure-card">
       <svg class="joint" viewBox="0 0 720 500" role="img" aria-label="Cross-section through the bracket at the screw axis: the upright's face metal, the plate holding a captured square nut in an internal cavity behind a solid wall, the SKADIS board, and the M4 screw clamping the board flat to the plate.">
       <rect class="steel" x="150.0" y="32.0" width="120.0" height="436.0" rx="2"/>
@@ -323,7 +323,7 @@
       <li><b>The IKEA decorative M4 screw, 15 mm.</b> Its tip stops 2 mm short of the plate's back face.</li>
     </ol>
   </div>
-  <div class="callout-box"><p><b>Why not just bolt through?</b> Because a bolt through a fixed hole has no adjustment, and neither did the two designs before this one. The board's slots repeat every 40&nbsp;mm and the desk's uprights are 735.04&nbsp;mm apart; those two numbers do not agree, and the difference has to go somewhere. Here it goes into a nut that slides.</p></div>
+  <div class="callout-box"><p><b>Why not just bolt through?</b> Because a bolt through a fixed hole has no adjustment. The board's slots repeat every 40&nbsp;mm and the desk's uprights are 735.04&nbsp;mm apart; those two numbers do not agree, and the difference has to go somewhere. Here it goes into a nut that slides.</p></div>
 </section>
 
 <section>
@@ -346,8 +346,8 @@
 
 <section id="measured">
   <span class="eyebrow">Measured, not assumed</span>
-  <h2>Every guess in this project was wrong</h2>
-  <p class="big">And every measurement has held. Two measured numbers set the whole part.</p>
+  <h2>Two measurements set the whole part</h2>
+  <p class="big">Both were taken off the hardware. Get either one wrong and the plate comes out the wrong thickness.</p>
   <div class="grid-2">
     <div class="card"><span class="num">6.0 mm</span><p><b>The board.</b> Not the 4.6 mm both community SKÅDIS libraries quote. Everything downstream of a screw length depends on it.</p></div>
     <div class="card"><span class="num">15 mm</span><p><b>The decorative screw.</b> Through a 6 mm board that leaves 9 mm behind it with nowhere to go — which is what sets the plate.</p></div>
@@ -362,7 +362,7 @@
       <tr><td>Upright slot</td><td class="num">3/4" tall, 1" pitch</td><td>one column per upright, ~1/8" wide</td></tr>
       <tr><td>Slot column spacing</td><td class="num">735.04 mm</td><td>28 13/16" between facing edges, plus one slot width</td></tr>
       <tr><td>SKÅDIS slot</td><td class="num">5 × 15 mm</td><td>40 mm grid, second grid offset 20 mm both ways</td></tr>
-      <tr><td>Square nut</td><td class="num">7 × 7 × 3 mm</td><td>a DIN 557 pattern, not the thin DIN 562 first assumed</td></tr>
+      <tr><td>Square nut</td><td class="num">7 × 7 × 3 mm</td><td>a DIN 557 pattern &mdash; not the thin DIN 562, which is 2.2 mm</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -384,14 +384,14 @@
       <tr><td class="num">1 × 25.4 = 25.4 mm</td><td class="num">1 × 40 = 40 mm</td><td class="num">14.6 mm</td><td class="no">no</td></tr>
     </tbody>
   </table></div>
-  <p>The build script prints that list on every run, so it cannot get lost in a README nobody rereads. Left and right brackets are mirrored, each putting its cavity 7.52&nbsp;mm toward the middle of the desk — where the board's nearest slot column falls at the measured spacing.</p>
+  <p>The build script prints that list on every run. Left and right brackets are mirrored, each putting its cavity 7.52&nbsp;mm toward the middle of the desk — where the board's nearest slot column falls at the measured spacing.</p>
 </section>
 
 <section id="printing">
   <span class="eyebrow">Printing</span>
   <h2>One orientation matters more than the rest</h2>
   <p class="big">Lay the bracket on a side face so the hook profile is drawn inside every layer instead of stacked across them. The cavity and the screw slot then need no support at all — they run along the build direction — and supports grow only under the two hooks.</p>
-  <div class="callout-box"><p><b>Put the inboard edge on the bed.</b> <code>--rotate-x -90</code> for the left bracket, <code>--rotate-x 90</code> for the right. That puts the cavity's outboard end uppermost, and that end carries a 45° roof beyond the nut's stop so it prints with nothing under it. The other way up leaves a flat 3.4&nbsp;mm ceiling on top, and the slicer grows organic support up inside the cavity to hold it &mdash; where the nut has to slide, and where you can never reach. Sliced both ways: supports reach z&nbsp;29.0 wrong way up against z&nbsp;21.6 right way up.</p></div>
+  <div class="callout-box"><p><b>Put the inboard edge on the bed.</b> <code>--rotate-x -90</code> for the left bracket, <code>--rotate-x 90</code> for the right. That puts the cavity's outboard end uppermost, and that end carries a 45° roof beyond the nut's stop so it prints with nothing under it. The other way up leaves a flat 3.4&nbsp;mm ceiling on top, and the slicer grows organic support up inside the cavity to hold it &mdash; where the nut has to slide, and where you can never reach.</p></div>
   <div class="grid-3">
     <div class="card"><span class="num">PETG</span><p>Sufficient, and arguably better than ASA here: the 2.4 mm hook tab is tougher in PETG, and nothing warps. Stresses run 2–5% of yield.</p></div>
     <div class="card"><span class="num">4 walls · 40%</span><p>Stock “structural” profiles ship thinner than this, and the hooks carry the whole board.</p></div>

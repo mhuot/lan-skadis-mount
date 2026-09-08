@@ -57,8 +57,7 @@ plate:
 
 ## Measured, not assumed
 
-Every dimension in this project that was assumed turned out to be wrong, and
-every one that was measured has held. These are the measured ones.
+All taken off the hardware rather than from a datasheet or a library.
 
 | What | Value | Note |
 | --- | --- | --- |
@@ -68,9 +67,9 @@ every one that was measured has held. These are the measured ones.
 | SKÅDIS slot | 5 × 15 mm on a 40 mm grid | second grid offset 20 mm both ways |
 | Decorative M4 screw | **15 mm** | the one IKEA ships |
 
-The nut is a DIN 557 pattern at 7 × 7 × 3 mm, not the thin DIN 562 (2.2 mm)
-this was first built around. An open channel hid that — a pocket facing the
-board does not care how thick the nut is. An enclosed cavity does.
+The nut is a DIN 557 pattern at 7 × 7 × 3 mm. Check yours before printing:
+the thin DIN 562 in the same thread size is only 2.2 mm, and the cavity is
+sized so a nut that thin would rattle in it.
 
 ## The plate thickness is derived, not chosen
 
@@ -112,8 +111,8 @@ spacing your board has room for rather than the first one that works.
 | 2 × 25.4 = 50.8 mm | 1 × 40 = 40 mm | 10.8 mm | ❌ of 11.0 available |
 | 1 × 25.4 = 25.4 mm | 1 × 40 = 40 mm | 14.6 mm | ❌ |
 
-`build_skadis_nut_bracket.py` prints this list on every run, so it cannot
-get lost. The left and right brackets are mirrored: each puts its channel
+`build_skadis_nut_bracket.py` prints this list on every run. The left and
+right brackets are mirrored: each puts its cavity
 7.52 mm toward the centre of the desk, which is where the board's nearest
 slot column falls at a 735.04 mm upright spacing.
 
@@ -130,22 +129,23 @@ uppermost. That is `--rotate-x -90` for the **left** bracket and
 not share a rotation.
 
 The other way up puts the cavity's flat inboard end on top, where it is a
-3.4 mm ceiling, and the slicer grows organic support up inside the cavity to
-hold it — support that sits exactly where the nut has to slide and can never
-be reached. Sliced both ways, supports reach z 29.0 wrong way up against
-z 21.6 right way up, and only the second stops at the hooks.
+3.4 mm ceiling, and the slicer fills the cavity with organic support — sitting
+exactly where the nut has to slide, and impossible to reach once the part is
+off the bed.
 
-- **ASA** for the real set: it creeps less than PETG under the permanent
-  tension in the hooks. PETG is fine for a fit test.
+- **PETG.** Stresses run 2–5% of yield, so creep is not the concern it is on
+  the spool cradle, and the 2.4 mm hook tab is tougher in PETG than in ASA.
+  Nothing warps, either.
 - 4 perimeters, 40% infill. The stock "STRUCTURAL" profiles are thinner
-  than that.
+  than that, and the hooks carry the whole board.
+- Organic supports at a **0.25 mm** contact distance. PETG welds itself to
+  them at the usual 0.2.
 - Supports touch the *side face of the hook tabs* — the face that enters the
   slot. Caliper a tab after cleanup: nominal 2.4 mm, and it has to stay
   under about 2.6 mm to enter a 3.2 mm slot.
-- PETG welds itself to organic supports; a 0.25 mm contact distance breaks
-  away cleanly without the lips drooping.
 
-About 8 g and 35–40 minutes per bracket.
+About 16 g and an hour per bracket. Four to a plate on a Mini fits at a
+14 mm spacing; below that the brims collide.
 
 ## Building the models
 
@@ -165,7 +165,7 @@ Each run exports `cad/*.step`, `cad/*.f3d` and `exports/*.stl` together, so
 they cannot drift apart. Locally, in `.venv`:
 
 ```sh
-.venv/bin/python scripts/check_stl.py exports/skadis_nut_left.stl 16529
+.venv/bin/python scripts/check_stl.py exports/skadis_nut_left.stl 16182
 .venv/bin/python scripts/build_web_assets.py       # the GLBs the page loads
 .venv/bin/python scripts/render_part.py exports/skadis_nut_left.stl out.png
 ```
