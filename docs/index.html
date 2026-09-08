@@ -8,6 +8,8 @@
 <meta property="og:title" content="LAN SKÅDIS Mount">
 <meta property="og:description" content="Hang a SKÅDIS pegboard on an old Ergotron desk frame. A captured square nut slides inside the bracket, so the board is aligned at assembly instead of at slicing.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://mhuot.github.io/lan-skadis-mount/images/boards-installed.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <style>
   :root {
@@ -106,6 +108,15 @@
     border-radius: 16px; box-shadow: var(--shadow);
   }
   .hero model-viewer { margin-top: 2.5rem; background: #0f1319; border-color: #ffffff14; }
+  .hero-shot { margin: 2.5rem 0 0; }
+  .hero-shot img {
+    width: 100%; display: block; border-radius: 16px;
+    border: 1px solid #ffffff1f; cursor: zoom-in;
+    box-shadow: 0 20px 50px -24px rgba(0,0,0,.9);
+  }
+  .hero-shot figcaption {
+    color: var(--ink-muted); font-size: .86rem; padding: .75rem 0 0; text-align: center;
+  }
   .hint { color: var(--faint); font-size: .84rem; text-align: center; padding: .6rem 0 0; }
   .hero .hint { color: var(--ink-muted); }
 
@@ -238,13 +249,10 @@
     <a class="btn btn-primary" href="https://github.com/mhuot/lan-skadis-mount">Get the files</a>
     <a class="btn btn-ghost" href="#joint">How the joint works</a>
   </div>
-  <model-viewer
-    src="models/skadis-mount.glb?v=c26d11df"
-    alt="3D model of a SKÅDIS pegboard hanging on four red printed brackets hooked into two steel uprights"
-    camera-controls auto-rotate auto-rotate-delay="1200" rotation-per-second="16deg"
-    shadow-intensity="0.9" exposure="1.05" camera-orbit="68deg 80deg 82%"
-    interaction-prompt="none"></model-viewer>
-  <p class="hint">Drag to spin, scroll to zoom. Orbit round the back to find the brackets.</p>
+  <figure class="hero-shot">
+    <img src="images/boards-installed.jpg?v=dd5b9807" alt="Two white IKEA SKADIS pegboards mounted side by side on the steel uprights of an Ergotron desk frame above a workbench, held by eight printed brackets whose screw heads show at the board corners" data-zoom>
+    <figcaption>Two 76&nbsp;×&nbsp;56&nbsp;cm boards on eight brackets. The only fixings you can see are the four decorative screws per board &mdash; nothing is drilled into the frame.</figcaption>
+  </figure>
 </div></header>
 
 <div class="wrap">
@@ -257,6 +265,19 @@
 </div>
 
 <main class="wrap">
+
+<section>
+  <span class="eyebrow">The assembly</span>
+  <h2>Eight brackets, four to a board</h2>
+  <p class="big">Two per upright, 482.6&nbsp;mm apart, which lands them about 17&nbsp;mm inside each corner of the board. The brackets hook into slots the desk already has; the boards hang on them and come off the same way.</p>
+  <model-viewer
+    src="models/skadis-mount.glb?v=c26d11df"
+    alt="3D model of a SKÅDIS pegboard hanging on four red printed brackets hooked into two steel uprights"
+    camera-controls auto-rotate auto-rotate-delay="1200" rotation-per-second="16deg"
+    shadow-intensity="0.9" exposure="1.05" camera-orbit="68deg 80deg 82%"
+    interaction-prompt="none"></model-viewer>
+  <p class="hint">Drag to spin, scroll to zoom. Orbit round the back to find the brackets.</p>
+</section>
 
 <section id="joint">
   <span class="eyebrow">The joint</span>

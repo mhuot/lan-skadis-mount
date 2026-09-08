@@ -10,6 +10,12 @@ the hook that grips the upright is the one already fit-verified on the real
 desk.
 
 <p align="center">
+  <img src="docs/images/boards-installed.jpg" width="100%" alt="Two white IKEA SKÅDIS pegboards mounted side by side on the steel uprights of an Ergotron desk frame above a workbench">
+</p>
+
+<p align="center"><em>Two 76 × 56 cm boards on eight brackets. The only fixings you can see are the four decorative screws per board — nothing is drilled into the frame.</em></p>
+
+<p align="center">
   <img src="docs/images/nut_bracket_front.png" width="31%" alt="Front of the bracket: flat but for the screw slot">
   <img src="docs/images/nut_bracket_edge.png" width="31%" alt="Section along the cavity: the nut drops in from the top edge and slides inboard">
   <img src="docs/images/nut_bracket_section.png" width="31%" alt="Section through the bracket, showing the nut cavity behind a solid wall">
