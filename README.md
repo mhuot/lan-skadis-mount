@@ -9,6 +9,19 @@ Grown out of [lan-spool-shelf](https://github.com/mhuot/lan-spool-shelf).
 The hook that grips the upright is the one already fit-verified on the real
 desk.
 
+## The desk
+
+In the 1990s it felt like every NOC and data center, at least the ones near
+me, had furniture from [Ergotron](https://www.ergotron.com/) in
+[Eagan, Minnesota](https://en.wikipedia.org/wiki/Eagan,_Minnesota). The desks
+matched the look those rooms had and the job they did.
+
+The one I have sat in a data center with a row of computers on it. They ran
+the small ISP my employer operated. I picked it up when the company
+liquidated, after they were no more. The slotted uprights are the same ones
+that held their shelves, which is what makes this project possible without a
+drill.
+
 <p align="center">
   <img src="docs/images/boards-installed.jpg" width="100%" alt="Two white IKEA SKÅDIS pegboards mounted side by side on the steel uprights of an Ergotron desk frame above a workbench">
 </p>
