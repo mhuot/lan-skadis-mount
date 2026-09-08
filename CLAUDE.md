@@ -1,4 +1,4 @@
-# lan-skadis-mount
+# skadis-bench-frame-mount
 
 3D-printed brackets that hang a board on the slotted DuraFrame uprights of
 an Ergotron LAN Organizer 3000. Two designs: the **SKÅDIS captured-nut
@@ -62,7 +62,7 @@ back out in the hand). Do not reintroduce any; git history has all three.
   upright, hook throat = face metal 2.0 + 1.8 mm) was VERIFIED by printed
   gauges in ~/lan-spool-shelf — reuse changes from there deliberately.
 - Builds land in the Fusion cloud project **"LAN Pegboard Mount"** (named
-  before the repo was renamed to lan-skadis-mount; FUSION_PROJECT_NAME in
+  before the repo was renamed to skadis-bench-frame-mount; FUSION_PROJECT_NAME in
   each script must keep matching the cloud project, so do not rename one
   without the other) as the documents "Pegboard Mount Bracket", "SKADIS Nut
   Bracket Left/Right/Coupon" (the peg design's documents are stale, and are

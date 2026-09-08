@@ -31,7 +31,7 @@ MM = 0.1  # Fusion API lengths are centimetres
 # Set True only to deliberately discard a hand edit in the document.
 ALLOW_OVERWRITE = False
 
-PROJECT_DIR = "/Users/mhuot/lan-skadis-mount"
+PROJECT_DIR = "/Users/mhuot/skadis-bench-frame-mount"
 FUSION_PROJECT_NAME = "LAN Pegboard Mount"
 DOC_NAME = "Pegboard Mount Bracket"
 EXPORT_NAME = "pegboard_mount_bracket"

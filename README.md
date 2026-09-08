@@ -1,4 +1,4 @@
-# LAN SKÅDIS Mount
+# SKÅDIS Bench Frame Mount
 
 Hang an IKEA SKÅDIS pegboard on the slotted DuraFrame uprights of an
 Ergotron LAN Organizer 3000. A sheet of hardware-store pegboard works too. No
